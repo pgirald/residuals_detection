@@ -1,0 +1,9 @@
+function [stfeats] = frequency_domain_stats(signal, timeStep)
+    sffe = signalFrequencyFeatureExtractor(SampleRate=1/timeStep, ...
+    MeanFrequency=true, MedianFrequency=true, BandPower=true,...
+    OccupiedBandwidth=true, PowerBandwidth=true, PeakAmplitude=true,...
+    PeakLocation=true);
+
+    stfeats = extract(sffe, signal);
+end
+

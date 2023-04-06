@@ -4,52 +4,63 @@ clc;
 
 load data\sequence.mat;
 
-f = 20;
-c = 128;
-stepTime = 0.2;
+%Programm configuration
+spbinscount = 25;%bins count for splines coefficients
+fsbinscount = 25;%bins count for frenet_serret tangent unitary vector
 
-imgsCount = size(imgs, 3);
+channels = 3;
+[rows, cols] = size(imgs, [1 2]);
+imgscount = size(imgs, 4);
+locations = rows * cols;
 
-imgIdx = 300;
+tdlabels = time_domain_labels();
+tdlabels = [strcat(tdlabels, '_red'),...
+    strcat(tdlabels, '_green'),...
+    strcat(tdlabels, '_blue')];
+tdtypes = cell(1, numel(tdlabels));
+tdtypes(:) = {'double'};
 
-r = zeros(imgsCount, 1);
-g = zeros(imgsCount, 1);
-b = zeros(imgsCount, 1);
+fdlabels = frequency_domain_labels();
+fdlabels = [strcat(fdlabels, '_red'),...
+    strcat(fdlabels, '_green'),...
+    strcat(fdlabels, '_blue')];
+fdtypes = cell(1, numel(fdlabels));
+fdtypes(:) = {'double'};
 
-r(:) = imgs(f, c, :, 1);
-g(:) = imgs(f, c, :, 2);
-b(:) = imgs(f, c, :, 3);
 
-figure, plot3(r, g, b, 'ro');
+spcoefs = zeros(locations, spbinscount * channels);
+tdstats = table('Size', [locations, numel(tdlabels)],...
+    'VariableTypes', tdtypes,'VariableNames', tdlabels);
+fsstats = table('Size', [locations, numel(fdlabels)],...
+    'VariableTypes', fdtypes,'VariableNames', fdlabels);
+fsfeats = zeros(locations, imgscount * 2 + fsbinscount * 3);
 
-img = cat(3, imgs(:, :, imgIdx, 1), imgs(:, :, imgIdx, 2), imgs(:, :, imgIdx, 3));
+li = 1;
 
-img = uint8(img);
+r = zeros(1, imgscount);
+g = zeros(1, imgscount);
+b = zeros(1, imgscount);
 
-img(f, c, :) = [255, 0, 0];
+for i=1:cols
+    for j=1:rows
+        r(:) = imgs(j, i, 1, :);
+        g(:) = imgs(j, i, 2, :);
+        b(:) = imgs(j, i, 3, :);
 
-figure, imshow(img);
+        spcoefs(li, :) =  [splinescoefs(times, r, spbinscount),...
+            splinescoefs(times, g, spbinscount),...
+            splinescoefs(times, b, spbinscount)];
 
-signals = timetable(seconds(times(:, 1)), r, g, b);
+        tdstats(li, :) = num2cell([time_domain_stats(r, timeStep),...
+            time_domain_stats(g, timeStep),...
+            time_domain_stats(b, timeStep)]);
 
-signals.Properties.VariableNames = ["Red" "Green" "Blue"];
+        fsstats(li, :) = num2cell([frequency_domain_stats(r, timeStep),...
+            frequency_domain_stats(g, timeStep),...
+            frequency_domain_stats(b, timeStep)]);
 
-splines = cscvn([r, g, b]');
+        fsfeats(li, :) = frenet_serret(r, g, b, fsbinscount);
 
-fnplt(splines,'b',2);
-
-splines.coefs;
-
-stfe = signalTimeFeatureExtractor(SampleRate=1/stepTime, Mean = true, RMS= true,...
-    StandardDeviation= true, ShapeFactor= true, SNR= true, THD= true,...
-    SINAD= true, PeakValue= true, CrestFactor= true,...
-    ClearanceFactor= true, ImpulseFactor= true);
-
-[stfefeats, stfeinfo] = extract(stfe, r);
-
-sffe = signalFrequencyFeatureExtractor(SampleRate=1/stepTime, ...
-    MeanFrequency=true, MedianFrequency=true, BandPower=true,...
-    OccupiedBandwidth=true, PowerBandwidth=true, PeakAmplitude=true,...
-    PeakLocation=true);
-
-[sffefeats, sffeinfo] = extract(sffe, r);
+        li = li + 1;
+    end
+end
