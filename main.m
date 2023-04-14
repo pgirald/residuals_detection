@@ -5,7 +5,7 @@ clc;
 load data\sequence.mat;
 
 %Programm configuration
-spbinscount = 25;%bins count for splines coefficients
+cubic_classes = 3;%bins count for splines coefficients
 fsbinscount = 25;%bins count for frenet_serret tangent unitary vector
 
 channels = 3;
@@ -28,7 +28,7 @@ fdtypes = cell(1, numel(fdlabels));
 fdtypes(:) = {'double'};
 
 
-spcoefs = zeros(locations, spbinscount * channels);
+spcoefs = zeros(locations, cubic_classes * channels);
 tdstats = table('Size', [locations, numel(tdlabels)],...
     'VariableTypes', tdtypes,'VariableNames', tdlabels);
 fsstats = table('Size', [locations, numel(fdlabels)],...
@@ -47,10 +47,10 @@ for i=1:cols
         g(:) = imgs(j, i, 2, :);
         b(:) = imgs(j, i, 3, :);
 
-        spcoefs(li, :) =  [splinescoefs(times, r, spbinscount),...
-            splinescoefs(times, g, spbinscount),...
-            splinescoefs(times, b, spbinscount)];
-
+        spcoefs(li, :) =  [splinescoefs(times, r),...
+            splinescoefs(times, g),...
+            splinescoefs(times, b)];
+        %{
         tdstats(li, :) = num2cell([time_domain_stats(r, timeStep),...
             time_domain_stats(g, timeStep),...
             time_domain_stats(b, timeStep)]);
@@ -60,6 +60,7 @@ for i=1:cols
             frequency_domain_stats(b, timeStep)]);
 
         fsfeats(li, :) = frenet_serret(r, g, b, fsbinscount);
+        %}
 
         li = li + 1;
     end

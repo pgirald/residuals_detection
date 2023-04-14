@@ -64,6 +64,8 @@ fnplt(sg, 'g');
 fnplt(sb, 'b'); 
 hold off;
 
+figure, plot3(fnval(sr, times), fnval(sg, times), fnval(sb, times), 'b');
+
 pr = fit(times, r, 'poly6');
 pg = fit(times, g, 'poly6');
 pb = fit(times, b, 'poly6');
@@ -77,3 +79,7 @@ hold off;
 
 sk = skewness(r);
 kr = kurtosis(r);
+
+%a_lt_0 = sr.coefs(:, 1) < 0;
+%sr.coefs(a_lt_0, [1 3]) = sr.coefs(a_lt_0, [1 3]) * -1;
+%b = sr.coefs(:, 3) - ((sr.coefs(:, 2) .^ 2) ./ (3 .* (sr.coefs(:, 1))));
