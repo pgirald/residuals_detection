@@ -10,7 +10,8 @@ function [class_count] = splinescoefs(x, y, tolerance)
     cases(p < 0) = 1;
     cases(p > 0) = 2;
     cases(p > - tolerance & p < tolerance | p == 0) = 3;
-    class_count = histcounts(cases, [1, 2, 3, 4]);
+    cases(isnan(p)) = 4;
+    class_count = histcounts(cases, [1, 2, 3, 4, 5]);
     %{
     class_count = histcounts(csp.coefs,  binscount, ...
         'Normalization', 'probability');

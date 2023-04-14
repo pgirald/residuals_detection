@@ -80,6 +80,10 @@ hold off;
 sk = skewness(r);
 kr = kurtosis(r);
 
-%a_lt_0 = sr.coefs(:, 1) < 0;
-%sr.coefs(a_lt_0, [1 3]) = sr.coefs(a_lt_0, [1 3]) * -1;
-%b = sr.coefs(:, 3) - ((sr.coefs(:, 2) .^ 2) ./ (3 .* (sr.coefs(:, 1))));
+
+coefs = zeros(size(sr.coefs, 1), size(sr.coefs, 2));
+a_lt_0 = sr.coefs(:, 1) < 0;
+coefs(~a_lt_0, :) = sr.coefs(~a_lt_0, :);
+coefs(a_lt_0, [1 3]) = sr.coefs(a_lt_0, [1 3]) * -1;
+p = coefs(:, 3) - ((coefs(:, 2) .^ 2) ./ (3 .* (coefs(:, 1))));
+
