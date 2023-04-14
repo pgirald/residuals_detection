@@ -53,15 +53,15 @@ for i=1:cols
         spcoefs(li, :) =  [splinescoefs(times, r),...
             splinescoefs(times, g),...
             splinescoefs(times, b)];
-        %}
+        
         tdstats(li, :) = num2cell([time_domain_stats(r, timeStep),...
             time_domain_stats(g, timeStep),...
             time_domain_stats(b, timeStep)]);
-        %{
+        %}
         fsstats(li, :) = num2cell([frequency_domain_stats(r, timeStep),...
             frequency_domain_stats(g, timeStep),...
             frequency_domain_stats(b, timeStep)]);
-
+        %{
         fsfeats(li, :) = frenet_serret(r, g, b, fsbinscount);
         %}
 
@@ -71,8 +71,6 @@ for i=1:cols
     end
 end
 
-waitbar(1, "Saving");
-
-save tdstats.mat tdstats;
+save fsstats.mat fsstats;
 
 close(h);
