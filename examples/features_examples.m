@@ -4,10 +4,10 @@ clc;
 
 load data\sequence.mat;
 
-f = 20;
-c = 128;
+f = 48;
+c = 162;
 imgsCount = size(imgs, 4);
-imgIdx = 600;
+imgIdx = 720;
 
 r = zeros(imgsCount, 1);
 g = zeros(imgsCount, 1);
@@ -33,18 +33,18 @@ signals.Properties.VariableNames = ["Red" "Green" "Blue"];
 
 splines = cscvn([r, g, b]');
 
-fnplt(splines,'r',2);
+figure, fnplt(splines,'r',2);
 
 splines.coefs;
 
-stfe = signalTimeFeatureExtractor(SampleRate=1/timeStep, Mean = true, ...
+stfe = signalTimeFeatureExtractor(SampleRate=1/timestep, Mean = true, ...
     RMS= true, StandardDeviation= true, ShapeFactor= true, SNR= true, ...
     THD= true, SINAD= true, PeakValue= true, CrestFactor= true,...
     ClearanceFactor= true, ImpulseFactor= true);
 
 [stfefeats, stfeinfo] = extract(stfe, r);
 
-sffe = signalFrequencyFeatureExtractor(SampleRate=1/timeStep, ...
+sffe = signalFrequencyFeatureExtractor(SampleRate=1/timestep, ...
     MeanFrequency=true, MedianFrequency=true, BandPower=true,...
     OccupiedBandwidth=true, PowerBandwidth=true, PeakAmplitude=true,...
     PeakLocation=true);
