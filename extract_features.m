@@ -7,8 +7,11 @@ load data\sequence.mat;
 %-----Programm configuration start-----
 
 %features to extract
+feats = {'cspclasses'};
+%{
 feats = {'csphist', 'cspclasses', 'tdstats', 'fsstats', 'frenetserret',...
     'haralick', 'cspcoefs'};
+%}
 %csphist: cubic splines coefficients histograms
 %cspclasses: cubic splines classes counts
 %tdstats: time domain statistics
@@ -18,10 +21,10 @@ feats = {'csphist', 'cspclasses', 'tdstats', 'fsstats', 'frenetserret',...
 %cspcoefs: cubic splines coefficients
 
 %bins count for splines coefficiens histograms
-cspbinscount = 25;
+cspbinscount = 8;
 
 %bins count for frenet_serret features vector histograms
-fsbinscount = 25;
+fsbinscount = 10;
 
 %frenet_serret features to be extracted
 fsfeats = {'xdir', 'ydir', 'zdir'};
@@ -44,6 +47,9 @@ normalizetd = true;
 
 %normalize signal before frequency domain stats
 normalizefd = true;
+
+%normalize cubic spline classes histogram
+normalizecspclasses = true;
 
 %-----Programm configuration end-----
 
@@ -142,9 +148,9 @@ for i=1:maskedlocs
     end
     
     if any(strcmp(feats,'cspclasses'))
-        cspclasses(li, :) =  [splinesclasses(times, r),...
-                    splinesclasses(times, g),...
-                    splinesclasses(times, b)];
+        cspclasses(li, :) =  [splinesclasses(times, r, normalizecspclasses),...
+                    splinesclasses(times, g, normalizecspclasses),...
+                    splinesclasses(times, b, normalizecspclasses)];
     
     end
 

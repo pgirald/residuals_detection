@@ -1,4 +1,4 @@
-function [class_count] = splinesclasses(x, y, tolerance)
+function [class_count] = splinesclasses(x, y, normalize, tolerance)
 %For each of 4 classes, computes the number of splines that belong to a class.
 %   This function Computes, For each of the 4 possible classes, the number
 %   of splines that belong to a class. actually, a cubic polynomial y can
@@ -7,7 +7,7 @@ function [class_count] = splinesclasses(x, y, tolerance)
 %   The form (class) number 4 refers to the case in wich the a coefficient
 %   equals 0. If p > - tolerance & p < tolerance, then it is assumed that
 %   p = 0.
-    if nargin < 3
+    if nargin < 4
         tolerance = 0.0001;
     end
     csp = csape(x, y, 'periodic');
@@ -20,6 +20,9 @@ function [class_count] = splinesclasses(x, y, tolerance)
     cases(p > - tolerance & p < tolerance | p == 0) = 3;
     cases(isnan(p)) = 4;
     class_count = histcounts(cases, [1, 2, 3, 4, 5]);
+    if normalize
+        class_count = class_count / sum(class_count);
+    end
     %{
     class_count = histcounts(csp.coefs,  binscount, ...
         'Normalization', 'probability');
