@@ -1,3 +1,20 @@
+%{
+Este código aun no es muy correcto, le falta optimización:
+
+1.  Utilizar POO. Crear por cada tipo de característica que se calcula aquí
+    una clase que encapsule todo lo que se necesite para calcular los
+    descriptores. Cada una de las clases debe de heredar de una clase padre
+    que contenga la información común. Con esto, se pueden reemplazar los
+    if de este código por bucles que ejecuten un método de los objetos de
+    cada clase.
+2.  Se está calculando compressedsize de una manera mediocre. Encontrar una
+    fórmula.
+3.  Si se especifica, por ejemplo, feats = {'compressed', 'csphist'};,
+    entonces, igualmente se reserva almacenamiento para las estructuras
+    destinadas para almacenar los seis tipos de caracaterísticas restantes.
+    Esto se corregira al utilizar POO (ver 1).
+%}
+
 clear;
 close all;
 clc;
