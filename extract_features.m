@@ -7,7 +7,8 @@ load data\sequence.mat;
 %-----Programm configuration start-----
 
 %features to extract
-feats = {'tdstats', 'fsstats'};
+feats = {'csphist', 'cspclasses', 'tdstats', 'fsstats', 'frenetserret',...
+    'haralick', 'cspcoefs'};
 %csphist: cubic splines coefficients histograms
 %cspclasses: cubic splines classes counts
 %tdstats: time domain statistics
@@ -17,7 +18,7 @@ feats = {'tdstats', 'fsstats'};
 %cspcoefs: cubic splines coefficients
 
 %bins count for splines coefficiens histograms
-cspbinscount = 10;
+cspbinscount = 25;
 
 %bins count for frenet_serret features vector histograms
 fsbinscount = 25;
@@ -33,7 +34,7 @@ cspcoeffeats = {'a', 'p'};
 
 %number of times that that the signal will be compressed before
 %splines coefficients extraction
-cspcompresstimes = 5;
+cspcompresstimes = 3;
 
 %haralick features to be extracted
 haralickfeats = {'Contrast', 'Correlation', 'Energy', 'Homogeneity'};

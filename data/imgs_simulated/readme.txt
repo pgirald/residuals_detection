@@ -1,0 +1,1 @@
+Here you put photoelasticity silmulated image just as it is specified in the imgs_real folder

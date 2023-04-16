@@ -4,10 +4,12 @@ clc;
 
 load data\sequence.mat;
 
-f = 48;
-c = 162;
+%f = 48;
+%c = 162;
+f = 18;
+c = 63;
 imgsCount = size(imgs, 4);
-imgIdx = 720;
+imgIdx = 600;
 
 r = zeros(imgsCount, 1);
 g = zeros(imgsCount, 1);

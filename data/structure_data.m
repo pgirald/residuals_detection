@@ -3,30 +3,30 @@ clear;
 clc;
 
 %---Programm configuration start
-imgscount = 720;
+directory = 'imgs_simulated';
+imgscount = 600;
 extension = 'bmp';
 maskname = 'Plant.bmp';
 timestep = 0.1;
-smooth = true;
-keeporiginals = true;
+smooth = false;
+keeporiginals = false;
 %---Programm configuration end
 
-mask = imread(['data/imgs/', maskname]);
+mask = imread(['data/', directory, '/', maskname]);
 [rows, cols] = size(mask, [1 2]);
 oimgs = zeros(rows, cols, 3, imgscount);
 times = 0 : 0.1 : 0.1 * (imgscount - 1);
 times = times';
 
-for i = 1:720
-    img = imread(['data/imgs/', num2str(i), '.', extension]);
+for i = 1:imgscount
+    img = imread(['data/', directory, '/', num2str(i), '.', extension]);
     oimgs(:, :, :, i) = img(:, :, :);
 end
-
-h = waitbar(0,'Smoothing signals...');
 
 li = 1;
 locations = rows * cols;
 if smooth
+    h = waitbar(0,'Smoothing signals...');
     imgs = zeros(rows, cols, 3, imgscount);
     for i = 1:cols
         for j = 1:rows
@@ -40,14 +40,15 @@ if smooth
             li = li + 1;
         end
     end
+    close(h);
 else
     imgs = oimgs;
 end
 
-close(h);
-
 mask(mask ~= 0) = 1;
-mask = mask(:, :, 1) & mask(:, :, 2) & mask(:, :, 3);
+if(size(mask, 3) == 3)
+    mask = mask(:, :, 1) & mask(:, :, 2) & mask(:, :, 3);
+end
 maskind = find(mask);
 [maskrow, maskcol] = ind2sub([rows cols], maskind);
 
