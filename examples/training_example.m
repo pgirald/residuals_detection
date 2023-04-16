@@ -45,7 +45,7 @@ img6 = kmeanssegm(table2array(haralick), rows, cols, maskind);
 nexttile, imshow(img6), title('Haralick');
 
 %There are features "in the way" for cubic splines classes!!!
-img7 = kmeanssegm(cspcoefs(:, 1), rows, cols, maskind);
+img7 = kmeanssegm(cspcoefs(:, 2), rows, cols, maskind);
 
 nexttile, imshow(img7), title('Splines coefficients');
 

@@ -7,7 +7,7 @@ load data\sequence.mat;
 %-----Programm configuration start-----
 
 %features to extract
-feats = {'cspclasses'};
+feats = {'csphist'};
 %{
 feats = {'csphist', 'cspclasses', 'tdstats', 'fsstats', 'frenetserret',...
     'haralick', 'cspcoefs'};
@@ -21,10 +21,10 @@ feats = {'csphist', 'cspclasses', 'tdstats', 'fsstats', 'frenetserret',...
 %cspcoefs: cubic splines coefficients
 
 %bins count for splines coefficiens histograms
-cspbinscount = 8;
+cspbinscount = 5;
 
 %bins count for frenet_serret features vector histograms
-fsbinscount = 10;
+fsbinscount = 5;
 
 %frenet_serret features to be extracted
 fsfeats = {'xdir', 'ydir', 'zdir'};
@@ -40,7 +40,9 @@ cspcoeffeats = {'a', 'p'};
 cspcompresstimes = 3;
 
 %haralick features to be extracted
-haralickfeats = {'Contrast', 'Correlation', 'Energy', 'Homogeneity'};
+haralickfeats = {'asm', 'contrast', 'correlation',...
+        'variance', 'idm', 'saverage', 'svariance', 'sentropy',...
+        'entropy', 'dvariance', 'dentropy', 'imc1', 'imc2', 'mcc'};
 
 %normalize signal before time domain stats
 normalizetd = true;
@@ -171,8 +173,8 @@ for i=1:maskedlocs
     end
 
     if any(strcmp(feats,'haralick'))
-        haralick(li, :) = [graycofeats(r, haralickfeats),...
-                    graycofeats(g, haralickfeats), graycofeats(b, haralickfeats)];
+        haralick(li, :) = num2cell([graycofeats(r, haralickfeats),...
+                    graycofeats(g, haralickfeats), graycofeats(b, haralickfeats)]);
     end
 
     if any(strcmp(feats,'cspcoefs'))
