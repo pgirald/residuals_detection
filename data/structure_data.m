@@ -44,6 +44,6 @@ close(h);
 mask(mask ~= 0) = 1;
 mask = mask(:, :, 1) & mask(:, :, 2) & mask(:, :, 3);
 maskind = find(mask);
-masksubs = ind2sub([rows cols], maskind);
+[maskrow, maskcol] = ind2sub([rows cols], maskind);
 
-save data/sequence.mat oimgs imgs timestep times maskind masksubs;
+save data/sequence.mat oimgs imgs timestep times maskind maskrow maskcol;

@@ -7,8 +7,7 @@ load data\sequence.mat;
 %-----Programm configuration start-----
 
 %features to extract
-feats = {'csphist', 'cspclasses', 'tdstats', 'fsstats', 'frenetserret',...
-    'haralick', 'cspcoefs'};
+feats = {'cspcoefs'};
 %csphist: cubic splines coefficients histograms
 %cspclasses: cubic splines classes counts
 %tdstats: time domain statistics
@@ -34,7 +33,7 @@ cspcoeffeats = {'a', 'p'};
 
 %number of times that that the signal will be compressed before
 %splines coefficients extraction
-cspcompresstimes = 0;
+cspcompresstimes = 5;
 
 %haralick features to be extracted
 haralickfeats = {'Contrast', 'Correlation', 'Energy', 'Homogeneity'};
@@ -111,7 +110,7 @@ frenetserret = zeros(locations, fsbinscount * numel(fsfeats));
 haralick = table('Size', [locations, numel(haralicklabels)],...
     'VariableTypes', haralicktypes,'VariableNames', haralicklabels);
 
-li = 1;
+maskedlocs = numel(maskind);
 
 %signals per channel
 r = zeros(1, imgscount);
@@ -121,58 +120,57 @@ b = zeros(1, imgscount);
 %progress bar
 h = waitbar(0,'Please wait...');
 
-for i=1:cols
-    for j=1:rows
-        r(:) = imgs(j, i, 1, :);
-        g(:) = imgs(j, i, 2, :);
-        b(:) = imgs(j, i, 3, :);
+for i=1:maskedlocs
+    %the current linear index
+    li = maskind(i);
+
+    r(:) = imgs(maskrow(i), maskcol(i), 1, :);
+    g(:) = imgs(maskrow(i), maskcol(i), 2, :);
+    b(:) = imgs(maskrow(i), maskcol(i), 3, :);
 
 
-        if any(strcmp(feats,'csphist'))
-            csphist(li, :) =  [splineshist(times, r, cspbinscount, csphistfeats),...
-                        splineshist(times, g, cspbinscount, csphistfeats),...
-                        splineshist(times, b, cspbinscount, csphistfeats)];
-        end
-        
-        if any(strcmp(feats,'cspclasses'))
-            cspclasses(li, :) =  [splinesclasses(times, r),...
-                        splinesclasses(times, g),...
-                        splinesclasses(times, b)];
-        
-        end
-
-        if any(strcmp(feats,'tdstats'))
-            tdstats(li, :) = num2cell([time_domain_stats(r, timestep),...
-                        time_domain_stats(g, timestep),...
-                        time_domain_stats(b, timestep)]);
-        end
-
-        if any(strcmp(feats,'fsstats'))
-            fsstats(li, :) = num2cell([frequency_domain_stats(r, timestep),...
-                        frequency_domain_stats(g, timestep),...
-                        frequency_domain_stats(b, timestep)]);
-        end
-
-        if any(strcmp(feats,'frenetserret'))
-            frenetserret(li, :) = frenet_serret(r, g, b, fsbinscount, fsfeats);
-        end
-
-        if any(strcmp(feats,'haralick'))
-            haralick(li, :) = [graycofeats(r, haralickfeats),...
-                        graycofeats(g, haralickfeats), graycofeats(b, haralickfeats)];
-        end
-
-        if any(strcmp(feats,'cspcoefs'))
-            cspcoefs(li, :) = [splinescoefs(times, r, cspcompresstimes,...
-                        cspcoeffeats), splinescoefs(times, g, cspcompresstimes,...
-                        cspcoeffeats), splinescoefs(times, b, cspcompresstimes,...
-                        cspcoeffeats)];
-        end
-        
-        waitbar(li / locations);
-
-        li = li + 1;
+    if any(strcmp(feats,'csphist'))
+        csphist(li, :) =  [splineshist(times, r, cspbinscount, csphistfeats),...
+                    splineshist(times, g, cspbinscount, csphistfeats),...
+                    splineshist(times, b, cspbinscount, csphistfeats)];
     end
+    
+    if any(strcmp(feats,'cspclasses'))
+        cspclasses(li, :) =  [splinesclasses(times, r),...
+                    splinesclasses(times, g),...
+                    splinesclasses(times, b)];
+    
+    end
+
+    if any(strcmp(feats,'tdstats'))
+        tdstats(li, :) = num2cell([time_domain_stats(r, timestep),...
+                    time_domain_stats(g, timestep),...
+                    time_domain_stats(b, timestep)]);
+    end
+
+    if any(strcmp(feats,'fsstats'))
+        fsstats(li, :) = num2cell([frequency_domain_stats(r, timestep),...
+                    frequency_domain_stats(g, timestep),...
+                    frequency_domain_stats(b, timestep)]);
+    end
+
+    if any(strcmp(feats,'frenetserret'))
+        frenetserret(li, :) = frenet_serret(r, g, b, fsbinscount, fsfeats);
+    end
+
+    if any(strcmp(feats,'haralick'))
+        haralick(li, :) = [graycofeats(r, haralickfeats),...
+                    graycofeats(g, haralickfeats), graycofeats(b, haralickfeats)];
+    end
+
+    if any(strcmp(feats,'cspcoefs'))
+        cspcoefs(li, :) = [splinescoefs(times, r, cspcompresstimes,...
+                    cspcoeffeats), splinescoefs(times, g, cspcompresstimes,...
+                    cspcoeffeats), splinescoefs(times, b, cspcompresstimes,...
+                    cspcoeffeats)];
+    end
+    
+    waitbar(i / maskedlocs);
 end
 
 if ~isfile('features.mat')
