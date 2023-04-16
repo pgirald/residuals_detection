@@ -7,7 +7,7 @@ load data\sequence.mat;
 %-----Programm configuration start-----
 
 %features to extract
-feats = {'cspcoefs'};
+feats = {'tdstats', 'fsstats'};
 %csphist: cubic splines coefficients histograms
 %cspclasses: cubic splines classes counts
 %tdstats: time domain statistics
@@ -17,7 +17,7 @@ feats = {'cspcoefs'};
 %cspcoefs: cubic splines coefficients
 
 %bins count for splines coefficiens histograms
-cspbinscount = 25;
+cspbinscount = 10;
 
 %bins count for frenet_serret features vector histograms
 fsbinscount = 25;
@@ -38,6 +38,11 @@ cspcompresstimes = 5;
 %haralick features to be extracted
 haralickfeats = {'Contrast', 'Correlation', 'Energy', 'Homogeneity'};
 
+%normalize signal before time domain stats
+normalizetd = true;
+
+%normalize signal before frequency domain stats
+normalizefd = true;
 
 %-----Programm configuration end-----
 
@@ -143,15 +148,15 @@ for i=1:maskedlocs
     end
 
     if any(strcmp(feats,'tdstats'))
-        tdstats(li, :) = num2cell([time_domain_stats(r, timestep),...
-                    time_domain_stats(g, timestep),...
-                    time_domain_stats(b, timestep)]);
+        tdstats(li, :) = num2cell([time_domain_stats(r, timestep, normalizetd),...
+                    time_domain_stats(g, timestep, normalizetd),...
+                    time_domain_stats(b, timestep, normalizetd)]);
     end
 
     if any(strcmp(feats,'fsstats'))
-        fsstats(li, :) = num2cell([frequency_domain_stats(r, timestep),...
-                    frequency_domain_stats(g, timestep),...
-                    frequency_domain_stats(b, timestep)]);
+        fsstats(li, :) = num2cell([frequency_domain_stats(r, timestep, normalizefd),...
+                    frequency_domain_stats(g, timestep, normalizefd),...
+                    frequency_domain_stats(b, timestep, normalizefd)]);
     end
 
     if any(strcmp(feats,'frenetserret'))

@@ -26,8 +26,8 @@ nexttile, imshow(img1), title('Time domain statistics');
 img2 = kmeanssegm(table2array(fsstats), rows, cols, maskind);
 
 nexttile, imshow(img2), title('Frequency domain statistics');
-
-img3 = kmeanssegm(cspclasses, rows, cols, maskind);
+%There are features "in the way" for cubic splines classes
+img3 = kmeanssegm(cspclasses(:, [1 2 5 6 9 10]), rows, cols, maskind);
 
 nexttile, imshow(img3), title('splines classes');
 
