@@ -49,3 +49,13 @@ img7 = kmeanssegm(cspcoefs(:, 2), rows, cols, maskind);
 
 nexttile, imshow(img7), title('Splines coefficients');
 
+img8 = kmeanssegm(compressedsignal, rows, cols, maskind);
+
+nexttile, imshow(img8), title('compressed');
+%{
+Sería bueno crear una matriz de características que tenga como columnas:
+-número de picos
+-alguna métrica que refleja la diferencia en la altura de los picos
+(tal vez un ángulo o solo restarle al pico más grane el pico más pequeño)
+-curvatura promedio y sus respectivas desviacioens estándar (o HOD)
+%}

@@ -7,7 +7,7 @@ load data\sequence.mat;
 %-----Programm configuration start-----
 
 %features to extract
-feats = {'csphist'};
+feats = {'compressed'};
 %{
 feats = {'csphist', 'cspclasses', 'tdstats', 'fsstats', 'frenetserret',...
     'haralick', 'cspcoefs'};
@@ -19,6 +19,7 @@ feats = {'csphist', 'cspclasses', 'tdstats', 'fsstats', 'frenetserret',...
 %frenetserret: frenet-serret features
 %haralick: haralick features
 %cspcoefs: cubic splines coefficients
+%compressed: compressed and normalized curve
 
 %bins count for splines coefficiens histograms
 cspbinscount = 5;
@@ -34,6 +35,10 @@ csphistfeats = {'p'};
 
 %splines coefficiens to be extracted
 cspcoeffeats = {'a', 'p'};
+
+%number of times that the normalized signal will be compressed
+%(to get the compressed signal feature)
+compresstimes = 5;
 
 %number of times that that the signal will be compressed before
 %splines coefficients extraction
@@ -97,6 +102,12 @@ haralicktypes(:) = {'double'};
 %(for splines coefficients extraction)
 z = zeros(1, imgscount);
 z = compress(z, z, cspcompresstimes);
+cspcompressedsize = numel(z);
+
+%computing the size that the compressed signal will have
+%(for the compressed signal feature)
+z = zeros(1, imgscount);
+z = compress(z, z, compresstimes);
 compressedsize = numel(z);
 
 %splines classes features matrix
@@ -107,7 +118,7 @@ csphist = zeros(locations, cspbinscount * numel(csphistfeats) * channels);
 
 %splines coefficients features matrix
 cspcoefs = zeros(locations,...
-    (numel(cspcoeffeats) * channels) * (compressedsize - 1));
+    (numel(cspcoeffeats) * channels) * (cspcompressedsize - 1));
 
 %time domain statistics features matrix
 tdstats = table('Size', [locations, numel(tdlabels)],...
@@ -123,6 +134,9 @@ frenetserret = zeros(locations, fsbinscount * numel(fsfeats));
 %haralick features matrix
 haralick = table('Size', [locations, numel(haralicklabels)],...
     'VariableTypes', haralicktypes,'VariableNames', haralicklabels);
+
+%compressed singal feature
+compressedsignal = zeros(locations, compressedsize * channels);
 
 maskedlocs = numel(maskind);
 
@@ -183,6 +197,12 @@ for i=1:maskedlocs
                     cspcoeffeats), splinescoefs(times, b, cspcompresstimes,...
                     cspcoeffeats)];
     end
+
+    if any(strcmp(feats,'compressed'))
+        compressedsignal(li, :) = [compressedcurve(times, r, compresstimes),...
+            compressedcurve(times, g, compresstimes),...
+            compressedcurve(times, b, compresstimes)];
+    end
     
     waitbar(i / maskedlocs);
 end
@@ -219,6 +239,10 @@ end
 
 if any(strcmp(feats,'cspcoefs'))
 	save features.mat cspcoefs -append;
+end
+
+if any(strcmp(feats,'compressed'))
+    save features.mat compressedsignal -append;
 end
 
 close(h);
