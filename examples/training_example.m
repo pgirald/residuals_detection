@@ -45,13 +45,13 @@ img6 = kmeanssegm(table2array(haralick), rows, cols, maskind);
 nexttile, imshow(img6), title('Haralick');
 
 %There are features "in the way" for cubic splines classes!!!
-img7 = kmeanssegm(cspcoefs(:, 2), rows, cols, maskind);
+img7 = kmeanssegm(cspcoefs, rows, cols, maskind);
 
 nexttile, imshow(img7), title('Splines coefficients');
 
-img8 = kmeanssegm(compressedsignal, rows, cols, maskind);
+img8 = kmeanssegm(sampledsignal, rows, cols, maskind);
 
-nexttile, imshow(img8), title('compressed');
+nexttile, imshow(img8), title('sampled');
 %{
 Sería bueno crear una matriz de características que tenga como columnas:
 -número de picos

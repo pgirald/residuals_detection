@@ -9,7 +9,7 @@ Este código aun no es muy correcto, le falta optimización:
     cada clase.
 2.  Se está calculando compressedsize de una manera mediocre. Encontrar una
     fórmula.
-3.  Si se especifica, por ejemplo, feats = {'compressed', 'csphist'};,
+3.  Si se especifica, por ejemplo, feats = {'sampled', 'csphist'};,
     entonces, igualmente se reserva almacenamiento para las estructuras
     destinadas para almacenar los seis tipos de caracaterísticas restantes.
     Esto se corregira al utilizar POO (ver 1).
@@ -24,7 +24,7 @@ load data\sequence.mat;
 %-----Programm configuration start-----
 
 %features to extract
-feats = {'compressed'};
+feats = {'sampled'};
 %{
 feats = {'csphist', 'cspclasses', 'tdstats', 'fsstats', 'frenetserret',...
     'haralick', 'cspcoefs'};
@@ -53,13 +53,13 @@ csphistfeats = {'p'};
 %splines coefficiens to be extracted
 cspcoeffeats = {'a', 'p'};
 
-%number of times that the normalized signal will be compressed
-%(to get the compressed signal feature)
-compresstimes = 5;
+%number of samples that will be taken from the signal
+%(to get the sampled signal feature)
+samples = 16;
 
-%number of times that that the signal will be compressed before
+%number of samples to be taken from the signal before
 %splines coefficients extraction
-cspcompresstimes = 3;
+cspsamples = 12;
 
 %haralick features to be extracted
 haralickfeats = {'asm', 'contrast', 'correlation',...
@@ -115,18 +115,6 @@ haralicklabels = [strcat(haralickfeats, '_red'),...
 haralicktypes = cell(1, numel(haralicklabels));
 haralicktypes(:) = {'double'};
 
-%computing the size that the compressed signal will have
-%(for splines coefficients extraction)
-z = zeros(1, imgscount);
-z = compress(z, z, cspcompresstimes);
-cspcompressedsize = numel(z);
-
-%computing the size that the compressed signal will have
-%(for the compressed signal feature)
-z = zeros(1, imgscount);
-z = compress(z, z, compresstimes);
-compressedsize = numel(z);
-
 %splines classes features matrix
 cspclasses = zeros(locations, cubic_classes * channels);
 
@@ -135,7 +123,7 @@ csphist = zeros(locations, cspbinscount * numel(csphistfeats) * channels);
 
 %splines coefficients features matrix
 cspcoefs = zeros(locations,...
-    (numel(cspcoeffeats) * channels) * (cspcompressedsize - 1));
+    (numel(cspcoeffeats) * channels) * (cspsamples - 1));
 
 %time domain statistics features matrix
 tdstats = table('Size', [locations, numel(tdlabels)],...
@@ -153,7 +141,7 @@ haralick = table('Size', [locations, numel(haralicklabels)],...
     'VariableTypes', haralicktypes,'VariableNames', haralicklabels);
 
 %compressed singal feature
-compressedsignal = zeros(locations, compressedsize * channels);
+sampledsignal = zeros(locations, samples * channels);
 
 maskedlocs = numel(maskind);
 
@@ -209,16 +197,16 @@ for i=1:maskedlocs
     end
 
     if any(strcmp(feats,'cspcoefs'))
-        cspcoefs(li, :) = [splinescoefs(times, r, cspcompresstimes,...
-                    cspcoeffeats), splinescoefs(times, g, cspcompresstimes,...
-                    cspcoeffeats), splinescoefs(times, b, cspcompresstimes,...
+        cspcoefs(li, :) = [splinescoefs(times, r, cspsamples,...
+                    cspcoeffeats), splinescoefs(times, g, cspsamples,...
+                    cspcoeffeats), splinescoefs(times, b, cspsamples,...
                     cspcoeffeats)];
     end
 
-    if any(strcmp(feats,'compressed'))
-        compressedsignal(li, :) = [compressedcurve(times, r, compresstimes),...
-            compressedcurve(times, g, compresstimes),...
-            compressedcurve(times, b, compresstimes)];
+    if any(strcmp(feats,'sampled'))
+        sampledsignal(li, :) = [samplecurve(r, samples),...
+            samplecurve(g, samples),...
+            samplecurve(b, samples)];
     end
     
     waitbar(i / maskedlocs);
@@ -258,8 +246,8 @@ if any(strcmp(feats,'cspcoefs'))
 	save features.mat cspcoefs -append;
 end
 
-if any(strcmp(feats,'compressed'))
-    save features.mat compressedsignal -append;
+if any(strcmp(feats,'sampled'))
+    save features.mat sampledsignal -append;
 end
 
 close(h);

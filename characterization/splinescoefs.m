@@ -1,4 +1,4 @@
-function [coefs] = splinescoefs(x, y, compresstimes, feats)
+function [coefs] = splinescoefs(x, y, samplescount, feats)
 %Extracts the coefficients of the splines of a compressed signal
 %   This function compresses the given signal to then perform cubic splines
 %   interpolation. Bearing in ming that any cubic polynomial can be
@@ -10,9 +10,8 @@ function [coefs] = splinescoefs(x, y, compresstimes, feats)
         feats = {};
     end
 
-    y = y / max(abs(y));
-
-    [x, y] = compress(x, y, compresstimes);
+    x = samplecurve(x, samplescount, false);
+    y = samplecurve(y, samplescount);
 
     csp = csape(x, y, 'periodic');
 

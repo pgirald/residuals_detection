@@ -1,8 +1,11 @@
-function [img] = kmeanssegm(x, width, height, maskind)
+function [img] = kmeanssegm(x, width, height, maskind, clusters)
 %Classifies each row of features in four different classes
 %   This function classifies each row as one correspondeing to either a 
-%   low, mean, high or critical zone 
-    idx = kmeans(x(maskind, :), 4);
+%   low, mean, high or critical zone
+    if nargin < 5
+        clusters = 4;
+    end
+    idx = kmeans(x(maskind, :), clusters);
     sgm = zeros(width * height, 1);
     sgm(maskind) = idx;
     sgm = reshape(sgm, [width height]);
