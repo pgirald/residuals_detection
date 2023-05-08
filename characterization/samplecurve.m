@@ -11,8 +11,10 @@ function [x] = samplecurve(x, samplescount, normalize)
         error("You have to exract at least two samples");
     end
 
-    if normalize
-        x = x / max(abs(x));
+    m = max(abs(x));
+
+    if normalize && m ~= 0
+        x = x / m;
     end
 
     if samplescount >= numel(x)

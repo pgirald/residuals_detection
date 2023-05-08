@@ -12,8 +12,12 @@ function [hists] = splineshist(x, y, binscount, feats)
         feats = {};
     end
 
-    y = y / max(abs(y));
-
+    m = max(abs(y));
+    
+    if(m ~= 0)
+        y = y / m;
+    end
+    
     csp = csape(x, y, 'periodic');
 
     a_lt_0 = csp.coefs(:, 1) < 0;

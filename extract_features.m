@@ -19,15 +19,17 @@ clear;
 close all;
 clc;
 
-load data\sequence.mat;
+load data\sequence_rtest.mat;
 
 %-----Programm configuration start-----
-
+%the name of the output file in which the features will be
+outfile = 'features_rtest';
 %features to extract
-feats = {'sampled'};
+feats = {'csphist', 'cspclasses', 'tdstats', 'fsstats', 'frenetserret',...
+    'haralick', 'cspcoefs', 'sampled'};
 %{
 feats = {'csphist', 'cspclasses', 'tdstats', 'fsstats', 'frenetserret',...
-    'haralick', 'cspcoefs'};
+    'haralick', 'cspcoefs', 'sampled'};
 %}
 %csphist: cubic splines coefficients histograms
 %cspclasses: cubic splines classes counts
@@ -37,6 +39,7 @@ feats = {'csphist', 'cspclasses', 'tdstats', 'fsstats', 'frenetserret',...
 %haralick: haralick features
 %cspcoefs: cubic splines coefficients
 %compressed: compressed and normalized curve
+%sampled: sampled points of the signal
 
 %bins count for splines coefficiens histograms
 cspbinscount = 5;
@@ -212,42 +215,42 @@ for i=1:maskedlocs
     waitbar(i / maskedlocs);
 end
 
-if ~isfile('features.mat')
+if ~isfile(outfile)
     aux = 0;
-    save features.mat aux;
+    save(outfile, 'aux');
     clear aux;
 end
 
 if any(strcmp(feats,'csphist'))
-	save features.mat csphist -append;
+	save(outfile, 'csphist', '-append');
 end
 
 if any(strcmp(feats,'cspclasses'))
-	save features.mat cspclasses -append;
+	save(outfile, 'cspclasses', '-append');
 end
 
 if any(strcmp(feats,'tdstats'))
-	save features.mat tdstats -append;
+	save(outfile, 'tdstats', '-append');
 end
 
 if any(strcmp(feats,'fsstats'))
-	save features.mat fsstats -append;
+	save(outfile, 'fsstats', '-append');
 end
 
 if any(strcmp(feats,'frenetserret'))
-	save features.mat frenetserret -append;
+	save(outfile, 'frenetserret', '-append');
 end
 
 if any(strcmp(feats,'haralick'))
-	save features.mat haralick -append;
+	save(outfile, 'haralick', '-append');
 end
 
 if any(strcmp(feats,'cspcoefs'))
-	save features.mat cspcoefs -append;
+	save(outfile, 'cspcoefs', '-append');
 end
 
 if any(strcmp(feats,'sampled'))
-    save features.mat sampledsignal -append;
+    save(outfile, 'sampledsignal', '-append');
 end
 
 close(h);

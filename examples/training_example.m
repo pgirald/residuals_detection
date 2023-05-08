@@ -7,7 +7,7 @@ load data\sequence.mat imgs maskind;
 
 channels = 3;
 
-imgIdx = 600;
+imgIdx = 560;
 
 img = cat(3, imgs(:, :, 1, imgIdx), imgs(:, :, 2, imgIdx), imgs(:, :, 3, imgIdx));
 
