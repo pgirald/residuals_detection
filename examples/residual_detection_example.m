@@ -3,26 +3,27 @@ clear;
 clc;
 
 feats = {'cspclasses','cspcoefs','csphist','frenetserret',...
-    'fsstats','haralick','sampledsignal',...
-    'tdstats'};
+    'fsstats','haralick','tdstats','sampledsignal'};
 
 data = {'imgs', 'maskind'};
 
 trainfeats = load('features_rtrain.mat', feats{:});
 traindata = load('data\sequence_rtrain.mat', data{:});
 
-testfeats = load('features_rtest.mat', feats{:});
-testdata = load('data\sequence_rtest.mat', data{:});
+testfeats = load('features_sim.mat', feats{:});
+testdata = load('data\sequence_sim.mat', data{:});
 
-featsmats = {trainfeats, testfeats};
+for i = 1:numel(feats)
+    if isa(trainfeats.(feats{i}), 'table')
+        trainfeats.(feats{i}) = table2array(trainfeats.(feats{i}));
+    end
+end
 
-trainfeats.haralick = table2array(trainfeats.haralick);
-trainfeats.tdstats = table2array(trainfeats.tdstats);
-trainfeats.fsstats = table2array(trainfeats.fsstats);
-
-testfeats.haralick = table2array(testfeats.haralick);
-testfeats.tdstats = table2array(testfeats.tdstats);
-testfeats.fsstats = table2array(testfeats.fsstats);
+for i = 1:numel(feats)
+    if isa(testfeats.(feats{i}), 'table')
+        testfeats.(feats{i}) = table2array(testfeats.(feats{i}));
+    end
+end
 
 msk = imread('data\imgs_residuals\Plant.bmp');
 rmsk = imread('data\imgs_residuals\Residual_mask.bmp');
@@ -43,6 +44,8 @@ img = cat(3, testimgs(:, :, 1, last), testimgs(:, :, 2, last), testimgs(:, :, 3,
 
 img = uint8(img);
 
+masks = zeros(size(testimgs, 1), size(testimgs, 2), numel(feats));
+
 figure, tiledlayout('flow');
 nexttile;
 imshow(img);
@@ -52,7 +55,18 @@ for i = 1:numel(feats)
     mdl = fitclinear(featmat(traindata.maskind), labels);
     featmat = testfeats.(feats{i});
     out(testdata.maskind) = predict(mdl, featmat(testdata.maskind));
+    masks(:, :, i) = reshape(out, size(testimgs, [1, 2]));
     nexttile;
-    imshow(reshape(out, size(testimgs, [1, 2])) * 255);
+    imshow(masks(:, :, i) * 255);
+    title(feats{i});
+end
+
+figure, tiledlayout('flow');
+
+for i = 1:numel(feats)
+    mask = uint8(masks(:, :, i));
+    mask = cat(3, mask, mask, mask);
+    nexttile;
+    imshow(img .* mask);
     title(feats{i});
 end

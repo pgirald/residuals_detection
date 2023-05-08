@@ -10,7 +10,7 @@ function [class_count] = splinesclasses(x, y, normalize, tolerance)
     if nargin < 4
         tolerance = 0.0001;
     end
-    csp = csape(x, y, 'periodic');
+    csp = csapi(x, y);
     a_lt_0 = csp.coefs(:, 1) < 0;
     csp.coefs(a_lt_0, [1 3]) = csp.coefs(a_lt_0, [1 3]) * -1;
     p = csp.coefs(:, 3) - ((csp.coefs(:, 2) .^ 2) ./ (3 .* (csp.coefs(:, 1))));

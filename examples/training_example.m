@@ -2,8 +2,8 @@ clear;
 clc;
 close all;
 
-load features.mat;
-load data\sequence.mat imgs maskind;
+load features_sim.mat;
+load data\sequence_sim.mat imgs maskind;
 
 channels = 3;
 

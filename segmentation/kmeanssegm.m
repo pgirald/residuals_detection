@@ -3,7 +3,7 @@ function [img] = kmeanssegm(x, width, height, maskind, clusters)
 %   This function classifies each row as one correspondeing to either a 
 %   low, mean, high or critical zone
     if nargin < 5
-        clusters = 5;
+        clusters = 4;
     end
     idx = kmeans(x(maskind, :), clusters);
     sgm = zeros(width * height, 1);
@@ -15,7 +15,7 @@ function [img] = kmeanssegm(x, width, height, maskind, clusters)
     img(:, :, 3) = img(:, :, 3) + ((sgm == 3) * 255);
     img(:, :, 1) = img(:, :, 1) + ((sgm == 4) * 255);
     img(:, :, 2) = img(:, :, 2) + ((sgm == 4) * 255);
-    img(:, :, 1) = img(:, :, 1) + ((sgm == 5) * 255);
-    img(:, :, 3) = img(:, :, 3) + ((sgm == 5) * 255);
+    %img(:, :, 1) = img(:, :, 1) + ((sgm == 5) * 255);
+    %img(:, :, 3) = img(:, :, 3) + ((sgm == 5) * 255);
 end
 

@@ -19,14 +19,13 @@ clear;
 close all;
 clc;
 
-load data\sequence_rtest.mat;
+load data\sequence_sim.mat;
 
 %-----Programm configuration start-----
 %the name of the output file in which the features will be
-outfile = 'features_rtest';
+outfile = 'features_sim.mat';
 %features to extract
-feats = {'csphist', 'cspclasses', 'tdstats', 'fsstats', 'frenetserret',...
-    'haralick', 'cspcoefs', 'sampled'};
+feats = {'cspclasses', 'sampled'};
 %{
 feats = {'csphist', 'cspclasses', 'tdstats', 'fsstats', 'frenetserret',...
     'haralick', 'cspcoefs', 'sampled'};
@@ -58,7 +57,7 @@ cspcoeffeats = {'a', 'p'};
 
 %number of samples that will be taken from the signal
 %(to get the sampled signal feature)
-samples = 16;
+samples = 25;
 
 %number of samples to be taken from the signal before
 %splines coefficients extraction
@@ -79,6 +78,10 @@ normalizefd = true;
 normalizecspclasses = true;
 
 %-----Programm configuration end-----
+
+if ~strcmp(outfile(end-3:end), '.mat')
+    error('The output file must have the extension .mat');
+end
 
 %RGB channels count
 channels = 3;
