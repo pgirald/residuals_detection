@@ -1,22 +1,17 @@
-function [img, labels] = kmeanssegm(x, width, height, maskind, clusters)
+function [img, labels] = kmeanssegm(labels, width, height, maskind, colors)
 %Classifies each row of features in four different classes
 %   This function classifies each row as one correspondeing to either a 
 %   low, mean, high or critical zone
-    if nargin < 5
-        clusters = 4;
-    end
-    idx = kmeans(x(maskind, :), clusters);
     sgm = zeros(width * height, 1);
-    sgm(maskind) = idx;
+    sgm(maskind) = labels;
     labels = sgm;
     sgm = reshape(sgm, [width height]);
-    img = zeros(width, height, 3);
-    img(:, :, 1) = img(:, :, 1) + ((sgm == 1) * 255);
-    img(:, :, 2) = img(:, :, 2) + ((sgm == 2) * 255);
-    img(:, :, 3) = img(:, :, 3) + ((sgm == 3) * 255);
-    img(:, :, 1) = img(:, :, 1) + ((sgm == 4) * 255);
-    img(:, :, 2) = img(:, :, 2) + ((sgm == 4) * 255);
-    %img(:, :, 1) = img(:, :, 1) + ((sgm == 5) * 255);
-    %img(:, :, 3) = img(:, :, 3) + ((sgm == 5) * 255);
+    img = uint8(zeros(width, height, 3));
+    lbs = unique(labels(labels>=1));
+    for i = 1:numel(lbs)
+        img(:, :, 1) = img(:, :, 1) + (uint8(sgm == lbs(i)) * uint8(colors(i, 1)));
+        img(:, :, 2) = img(:, :, 2) + (uint8(sgm == lbs(i)) * uint8(colors(i, 2)));
+        img(:, :, 3) = img(:, :, 3) + (uint8(sgm == lbs(i)) * uint8(colors(i, 3)));
+    end
 end
 

@@ -2,11 +2,17 @@ clear;
 clc;
 close all;
 
+clusters = 4;
+
+colors = randi([0 255], clusters, 3);
+
 ftnames = {'cspclasses','cspcoefs','csphist','frenetserret',...
     'fsstats','haralick','tdstats','sampledsignal', 'utvangs'};
 
 feats = load('features_sim.mat', ftnames{:});
 load data\sequence_sim.mat imgs maskind;
+
+centroids = dictionary(ftnames, zeros(1, numel(ftnames)));
 
 %feats.cspclasses = feats.cspclasses(:, [1 2 4 5 6 8 9 10 12]); 
 
@@ -61,7 +67,9 @@ nexttile, imshow(img), title('Original');
 [rows, cols] = size(imgs, [1 2]);
 
 for i = 1:numel(ftnames)
-    img = kmeanssegm(feats.(ftnames{i}), rows, cols, maskind);
+    x = feats.(ftnames{i});
+    labels = kmeans(x(maskind, :), clusters);
+    img = kmeanssegm(labels, rows, cols, maskind, colors);
     nexttile, imshow(img), title(ftnames{i});
 end
 
