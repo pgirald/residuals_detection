@@ -2,8 +2,49 @@ clear;
 clc;
 close all;
 
-load features_sim.mat;
+ftnames = {'cspclasses','cspcoefs','csphist','frenetserret',...
+    'fsstats','haralick','tdstats','sampledsignal', 'utvangs'};
+
+feats = load('features_sim.mat', ftnames{:});
 load data\sequence_sim.mat imgs maskind;
+
+%feats.cspclasses = feats.cspclasses(:, [1 2 4 5 6 8 9 10 12]); 
+
+%{
+cols = {'Mean','RMS','StandardDeviation','ShapeFactor','SINAD','SHR',...
+    'THD','PeakValue','CrestFactor','ClearanceFactor','ImpulseFactor',...
+    'skewness','kurtosis'};
+%}
+
+cols = {'PeakValue','ImpulseFactor', 'CrestFactor','ClearanceFactor'};
+
+tdlabels = [strcat(cols, '_red'),...
+    strcat(cols, '_green'),...
+    strcat(cols, '_blue')];
+
+feats.tdstats = feats.tdstats(:, tdlabels);
+
+%{
+cols = {'MeanFrequency', 'MedianFrequency',...
+    'BandPower', 'OccupiedBandwidth', 'PowerBandwidth', 'PeakAmplitude',...
+    'PeakLocation'};
+%}
+
+cols = {'MeanFrequency', 'MedianFrequency', 'PowerBandwidth'};
+
+fslabels = [strcat(cols, '_red'),...
+    strcat(cols, '_green'),...
+    strcat(cols, '_blue')];
+
+feats.fsstats = feats.fsstats(:, fslabels);
+
+%feats.utvangs = [std(feats.utvangs(:, 1:361),0, 2), std(feats.utvangs(:, 362:722), 0,2), std(feats.utvangs(:, 723:1083),0,2)];
+
+for i = 1:numel(ftnames)
+    if isa(feats.(ftnames{i}), 'table')
+        feats.(ftnames{i}) = table2array(feats.(ftnames{i}));
+    end
+end
 
 channels = 3;
 
@@ -19,39 +60,12 @@ nexttile, imshow(img), title('Original');
 
 [rows, cols] = size(imgs, [1 2]);
 
-img1 = kmeanssegm(table2array(tdstats), rows, cols, maskind);
+for i = 1:numel(ftnames)
+    img = kmeanssegm(feats.(ftnames{i}), rows, cols, maskind);
+    nexttile, imshow(img), title(ftnames{i});
+end
 
-nexttile, imshow(img1), title('Time domain statistics');
 
-img2 = kmeanssegm(table2array(fsstats), rows, cols, maskind);
-
-nexttile, imshow(img2), title('Frequency domain statistics');
-
-%There are features "in the way" for cubic splines classes
-img3 = kmeanssegm(cspclasses(:, [1 2 5 6 9 10]), rows, cols, maskind);
-
-nexttile, imshow(img3), title('splines classes');
-
-img4 = kmeanssegm(frenetserret, rows, cols, maskind);
-
-nexttile, imshow(img4), title('Frenet serret (unit tangent vector)');
-
-img5 = kmeanssegm(csphist, rows, cols, maskind);
-
-nexttile, imshow(img5), title('Splines histogram');
-
-img6 = kmeanssegm(table2array(haralick), rows, cols, maskind);
-
-nexttile, imshow(img6), title('Haralick');
-
-%There are features "in the way" for cubic splines classes!!!
-img7 = kmeanssegm(cspcoefs, rows, cols, maskind);
-
-nexttile, imshow(img7), title('Splines coefficients');
-
-img8 = kmeanssegm(sampledsignal, rows, cols, maskind);
-
-nexttile, imshow(img8), title('sampled');
 %{
 Sería bueno crear una matriz de características que tenga como columnas:
 -número de picos

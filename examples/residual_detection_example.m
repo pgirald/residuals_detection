@@ -10,8 +10,8 @@ data = {'imgs', 'maskind'};
 trainfeats = load('features_rtrain.mat', feats{:});
 traindata = load('data\sequence_rtrain.mat', data{:});
 
-testfeats = load('features_sim.mat', feats{:});
-testdata = load('data\sequence_sim.mat', data{:});
+testfeats = load('features_rtest.mat', feats{:});
+testdata = load('data\sequence_rtest.mat', data{:});
 
 for i = 1:numel(feats)
     if isa(trainfeats.(feats{i}), 'table')

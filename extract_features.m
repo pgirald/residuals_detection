@@ -25,10 +25,10 @@ load data\sequence_sim.mat;
 %the name of the output file in which the features will be
 outfile = 'features_sim.mat';
 %features to extract
-feats = {'cspclasses', 'sampled'};
+feats = {'frenetserret', 'utvangles'};
 %{
 feats = {'csphist', 'cspclasses', 'tdstats', 'fsstats', 'frenetserret',...
-    'haralick', 'cspcoefs', 'sampled'};
+    'haralick', 'cspcoefs', 'sampled', 'utvangles'};
 %}
 %csphist: cubic splines coefficients histograms
 %cspclasses: cubic splines classes counts
@@ -39,29 +39,33 @@ feats = {'csphist', 'cspclasses', 'tdstats', 'fsstats', 'frenetserret',...
 %cspcoefs: cubic splines coefficients
 %compressed: compressed and normalized curve
 %sampled: sampled points of the signal
+%utvangles: angles of unit tangen vectors respect to x, y and z
 
 %bins count for splines coefficiens histograms
 cspbinscount = 5;
 
 %bins count for frenet_serret features vector histograms
-fsbinscount = 5;
+fsbinscount = 100;
 
 %frenet_serret features to be extracted
 fsfeats = {'xdir', 'ydir', 'zdir'};
+
+%unit tangent vectors angles to be measured
+utvfeats = {'alpha', 'beta', 'gamma'};
 
 %splines coefficiens taken into account  for histograms
 csphistfeats = {'p'};
 
 %splines coefficiens to be extracted
-cspcoeffeats = {'a', 'p'};
+cspcoeffeats = {'p'};
 
 %number of samples that will be taken from the signal
 %(to get the sampled signal feature)
-samples = 25;
+samples = 100;
 
 %number of samples to be taken from the signal before
 %splines coefficients extraction
-cspsamples = 12;
+cspsamples = 100;
 
 %haralick features to be extracted
 haralickfeats = {'asm', 'contrast', 'correlation',...
@@ -69,7 +73,7 @@ haralickfeats = {'asm', 'contrast', 'correlation',...
         'entropy', 'dvariance', 'dentropy', 'imc1', 'imc2', 'mcc'};
 
 %normalize signal before time domain stats
-normalizetd = true;
+normalizetd = false;
 
 %normalize signal before frequency domain stats
 normalizefd = true;
@@ -83,12 +87,16 @@ if ~strcmp(outfile(end-3:end), '.mat')
     error('The output file must have the extension .mat');
 end
 
+%Number of possible angles to be taken into account in the utvangles
+%histogram
+totalangles = 361;
+
 %RGB channels count
 channels = 3;
 
 %count of classes in which splinesclasses() function classiffies cubic
 %polynomials
-cubic_classes = 4;
+spclasses = 2;
 
 [rows, cols] = size(imgs, [1 2]);
 
@@ -122,7 +130,7 @@ haralicktypes = cell(1, numel(haralicklabels));
 haralicktypes(:) = {'double'};
 
 %splines classes features matrix
-cspclasses = zeros(locations, cubic_classes * channels);
+cspclasses = zeros(locations, spclasses * channels);
 
 %splines histogram features matrix
 csphist = zeros(locations, cspbinscount * numel(csphistfeats) * channels);
@@ -141,6 +149,9 @@ fsstats = table('Size', [locations, numel(fdlabels)],...
 
 %frenet-serret features matrix
 frenetserret = zeros(locations, fsbinscount * numel(fsfeats));
+
+%Unit tangent vector angles features matrix
+utvangs = zeros(locations, totalangles * numel(utvfeats));
 
 %haralick features matrix
 haralick = table('Size', [locations, numel(haralicklabels)],...
@@ -197,6 +208,10 @@ for i=1:maskedlocs
         frenetserret(li, :) = frenet_serret(r, g, b, fsbinscount, fsfeats);
     end
 
+    if any(strcmp(feats,'utvangles'))
+        utvangs(li, :) = utvangles(r, g, b, utvfeats);
+    end
+
     if any(strcmp(feats,'haralick'))
         haralick(li, :) = num2cell([graycofeats(r, haralickfeats),...
                     graycofeats(g, haralickfeats), graycofeats(b, haralickfeats)]);
@@ -242,6 +257,10 @@ end
 
 if any(strcmp(feats,'frenetserret'))
 	save(outfile, 'frenetserret', '-append');
+end
+
+if any(strcmp(feats,'utvangles'))
+	save(outfile, 'utvangs', '-append');
 end
 
 if any(strcmp(feats,'haralick'))

@@ -3,8 +3,8 @@ clear;
 clc;
 
 %---Programm configuration start
-directory = 'imgs_residuals_test';
-imgscount = 600;
+directory = 'imgs_residuals_test1';
+imgscount = 400;
 extension = 'bmp';
 maskname = 'Plant.bmp';
 timestep = 0.1;
@@ -52,7 +52,7 @@ end
 maskind = find(mask);
 [maskrow, maskcol] = ind2sub([rows cols], maskind);
 
-save data/sequence_rtest.mat imgs timestep times maskind maskrow maskcol;
+save data/sequence_rtest1.mat imgs timestep times maskind maskrow maskcol;
 
 if keeporiginals
     save data/sequence.mat oimgs -append;

@@ -8,7 +8,7 @@ function [class_count] = splinesclasses(x, y, normalize, tolerance)
 %   equals 0. If p > - tolerance & p < tolerance, then it is assumed that
 %   p = 0.
     if nargin < 4
-        tolerance = 0.0001;
+        tolerance = 0.01;
     end
     csp = csapi(x, y);
     a_lt_0 = csp.coefs(:, 1) < 0;
@@ -17,9 +17,9 @@ function [class_count] = splinesclasses(x, y, normalize, tolerance)
     cases = zeros(size(p, 1), 1);
     cases(p < 0) = 1;
     cases(p > 0) = 2;
-    cases(p > - tolerance & p < tolerance | p == 0) = 3;
-    cases(isnan(p)) = 4;
-    class_count = histcounts(cases, [1, 2, 3, 4, 5]);
+    %cases(p > - tolerance & p < tolerance | p == 0) = 3;
+    %cases(isnan(p)) = 4;
+    class_count = histcounts(cases, [1, 2, 3]);
     if normalize
         class_count = class_count / sum(class_count);
     end

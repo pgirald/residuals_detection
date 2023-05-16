@@ -30,7 +30,7 @@ function [hists] = splineshist(x, y, binscount, feats)
 
     if any(strcmp(feats,'a'))
 
-        ahist = histcounts(csp.coefs(:, 1),  binscount);
+        ahist = histcounts(abs(csp.coefs(:, 1)),  binscount);
 
     end
 
@@ -38,7 +38,7 @@ function [hists] = splineshist(x, y, binscount, feats)
 
     if any(strcmp(feats,'p'))
 
-        phist = histcounts(p,  binscount - 1);
+        phist = histcounts(abs(p),  binscount - 1);
     
         phist(numel(phist) + 1) = sum(isnan(p));
 

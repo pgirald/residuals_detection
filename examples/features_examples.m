@@ -2,14 +2,14 @@ clear;
 close all;
 clc;
 
-load data\sequence_nrtest.mat;
+load data\sequence_sim.mat;
 
 %f = 48;
 %c = 162;
-f = 18;
-c = 63;
+f = 20;
+c = 64;
 imgsCount = size(imgs, 4);
-imgIdx = 560;
+imgIdx = 600;
 
 r = zeros(imgsCount, 1);
 g = zeros(imgsCount, 1);
@@ -49,7 +49,7 @@ stfe = signalTimeFeatureExtractor(SampleRate=1/timestep, Mean = true, ...
 sffe = signalFrequencyFeatureExtractor(SampleRate=1/timestep, ...
     MeanFrequency=true, MedianFrequency=true, BandPower=true,...
     OccupiedBandwidth=true, PowerBandwidth=true, PeakAmplitude=true,...
-    PeakLocation=true);
+    PeakLocation=true, WelchPSD=true);
 
 [sffefeats, sffeinfo] = extract(sffe, r);
 
@@ -66,7 +66,8 @@ fnplt(sg, 'g');
 fnplt(sb, 'b'); 
 hold off;
 
-figure, plot3(fnval(sr, times), fnval(sg, times), fnval(sb, times), 'b');
+figure, plot3(fnval(sr, times), fnval(sg, times), fnval(sb, times), 'b')...
+     ,xlabel('Red'), ylabel('Green'), zlabel('Blue');
 
 pr = fit(times, r, 'poly6');
 pg = fit(times, g, 'poly6');
