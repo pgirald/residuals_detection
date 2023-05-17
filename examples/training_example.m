@@ -4,7 +4,10 @@ close all;
 
 clusters = 4;
 
-colors = randi([0 255], clusters, 3);
+colors = [255 0 0
+            0 255 0
+            0 0 255
+            255 255 0];
 
 ftnames = {'cspclasses','cspcoefs','csphist','frenetserret',...
     'fsstats','haralick','tdstats','sampledsignal', 'utvangs'};
@@ -12,7 +15,7 @@ ftnames = {'cspclasses','cspcoefs','csphist','frenetserret',...
 feats = load('features_sim.mat', ftnames{:});
 load data\sequence_sim.mat imgs maskind;
 
-centroids = dictionary(ftnames, zeros(1, numel(ftnames)));
+centroids = cell(1, numel(ftnames));
 
 %feats.cspclasses = feats.cspclasses(:, [1 2 4 5 6 8 9 10 12]); 
 
@@ -68,11 +71,13 @@ nexttile, imshow(img), title('Original');
 
 for i = 1:numel(ftnames)
     x = feats.(ftnames{i});
-    labels = kmeans(x(maskind, :), clusters);
+    [labels, c] = kmeans(x(maskind, :), clusters);
+    centroids{i} = c;
     img = kmeanssegm(labels, rows, cols, maskind, colors);
     nexttile, imshow(img), title(ftnames{i});
 end
 
+centroids = dictionary(string(ftnames), centroids);
 
 %{
 Sería bueno crear una matriz de características que tenga como columnas:
