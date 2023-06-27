@@ -7,10 +7,12 @@ clusters = 4;
 colors = [255 0 0
             0 255 0
             0 0 255
-            255 255 0];
+            255 255 0
+            %255 0 255
+            %0 255 255
+            ];
 
-ftnames = {'cspclasses','cspcoefs','csphist','frenetserret',...
-    'fsstats','haralick','tdstats','sampledsignal', 'utvangs'};
+ftnames = { 'utvangs'};
 
 feats = load('features_sim.mat', ftnames{:});
 load data\sequence_sim.mat imgs maskind;
@@ -31,7 +33,7 @@ tdlabels = [strcat(cols, '_red'),...
     strcat(cols, '_green'),...
     strcat(cols, '_blue')];
 
-feats.tdstats = feats.tdstats(:, tdlabels);
+%feats.tdstats = feats.tdstats(:, tdlabels);
 
 %{
 cols = {'MeanFrequency', 'MedianFrequency',...
@@ -45,7 +47,7 @@ fslabels = [strcat(cols, '_red'),...
     strcat(cols, '_green'),...
     strcat(cols, '_blue')];
 
-feats.fsstats = feats.fsstats(:, fslabels);
+%feats.fsstats = feats.fsstats(:, fslabels);
 
 %feats.utvangs = [std(feats.utvangs(:, 1:361),0, 2), std(feats.utvangs(:, 362:722), 0,2), std(feats.utvangs(:, 723:1083),0,2)];
 
