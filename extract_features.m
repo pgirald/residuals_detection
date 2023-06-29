@@ -25,7 +25,7 @@ load data\sequence_sim.mat;
 %the name of the output file in which the features will be
 outfile = 'features_sim.mat';
 %features to extract
-feats = {'be'};
+feats = {'haralick'};
 %{
 feats = {'csphist', 'cspclasses', 'tdstats', 'fsstats', 'frenetserret',...
     'haralick', 'cspcoefs', 'sampled', 'utvangles', 'shape', 'be'};
@@ -77,10 +77,12 @@ samples = 100;
 cspsamples = 100;
 
 %haralick features to be extracted
+%{
 haralickfeats = {'asm', 'contrast', 'correlation',...
         'variance', 'idm', 'saverage', 'svariance', 'sentropy',...
         'entropy', 'dvariance', 'dentropy', 'imc1', 'imc2', 'mcc'};
-
+%}
+haralickfeats = {'idm', 'imc1', 'entropy', 'dentropy'};
 %normalize signal before time domain stats
 normalizetd = false;
 
