@@ -9,9 +9,13 @@ function [ent] = radentropy(x, y, z, delta)
     cz = mean(z);
     r = ((cx - x).^2 + (cy - y).^2 + (cz - z).^2).^(1/2);
     r_max = max(r);
-    edges = min(r):delta:r_max;
-    if edges(end) ~= r_max
-        edges(end + 1) = r_max;
+    if r_max == 0
+        edges = [0, 1];
+    else
+        edges = min(r):delta:r_max;
+        if edges(end) ~= r_max
+            edges(end + 1) = r_max;
+        end
     end
     h = histcounts(r, edges, 'Normalization','probability');
     ha = h(h~=0);

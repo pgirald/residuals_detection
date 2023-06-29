@@ -25,10 +25,10 @@ load data\sequence_sim.mat;
 %the name of the output file in which the features will be
 outfile = 'features_sim.mat';
 %features to extract
-feats = {'frenetserret', 'utvangles'};
+feats = {'be'};
 %{
 feats = {'csphist', 'cspclasses', 'tdstats', 'fsstats', 'frenetserret',...
-    'haralick', 'cspcoefs', 'sampled', 'utvangles'};
+    'haralick', 'cspcoefs', 'sampled', 'utvangles', 'shape', 'be'};
 %}
 %csphist: cubic splines coefficients histograms
 %cspclasses: cubic splines classes counts
@@ -40,6 +40,8 @@ feats = {'csphist', 'cspclasses', 'tdstats', 'fsstats', 'frenetserret',...
 %compressed: compressed and normalized curve
 %sampled: sampled points of the signal
 %utvangles: angles of unit tangen vectors respect to x, y and z
+%shape: shape descriptors
+%be: bending energy
 
 %bins count for splines coefficiens histograms
 cspbinscount = 5;
@@ -49,6 +51,13 @@ fsbinscount = 100;
 
 %frenet_serret features to be extracted
 fsfeats = {'xdir', 'ydir', 'zdir'};
+
+%shape features to be extracted
+shapefeats = {'Bending energy', 'Elongation', 'Entropy',...
+    'Major axis length', 'Total curvature'};
+
+%The delta value for the entropy shape descriptor
+raddelta = 0.1;
 
 %unit tangent vectors angles to be measured
 utvfeats = {'alpha', 'beta', 'gamma'};
@@ -157,6 +166,15 @@ utvangs = zeros(locations, totalangles * numel(utvfeats));
 haralick = table('Size', [locations, numel(haralicklabels)],...
     'VariableTypes', haralicktypes,'VariableNames', haralicklabels);
 
+%Shape features matrix
+shapetypes = cell(1, numel(shapefeats));
+shapetypes(:) = {'double'};
+
+shape = table('Size', [locations, numel(shapefeats)],...
+    'VariableTypes', shapetypes,'VariableNames', shapefeats);
+%bending energy
+be = zeros(locations, 3);
+
 %compressed singal feature
 sampledsignal = zeros(locations, samples * channels);
 
@@ -229,6 +247,16 @@ for i=1:maskedlocs
             samplecurve(g, samples),...
             samplecurve(b, samples)];
     end
+
+    if any(strcmp(feats, 'shape'))
+        shape(li, :) = num2cell(trayectorydescs(r', g', b', shapefeats,...
+            raddelta));
+    end
+
+    if any(strcmp(feats, 'be'))
+        be(li, :) = [bendingenergy2(times, r), bendingenergy2(times, g),...
+            bendingenergy2(times, b)];
+    end
     
     waitbar(i / maskedlocs);
 end
@@ -273,6 +301,14 @@ end
 
 if any(strcmp(feats,'sampled'))
     save(outfile, 'sampledsignal', '-append');
+end
+
+if any(strcmp(feats,'shape'))
+    save(outfile, 'shape', '-append');
+end
+
+if any(strcmp(feats,'be'))
+    save(outfile, 'be', '-append');
 end
 
 close(h);

@@ -1,8 +1,8 @@
 function [feats] = trayectorydescs(x, y, z, descs, entropydelta)
     %This function computes the specified shape descriptores in the
     %parameter descs. The five feautres that can be computed with this
-    %function are 'Bending energy', 'Elongation', 'Entropy', 'Major axis'
-    %and 'Total curvature'.
+    %function are 'Bending energy', 'Elongation', 'Entropy',
+    % 'Major axis length' and 'Total curvature'.
     be = [];
     if any(strcmp(descs,'Bending energy'))
         be = bendingenergy(x, y, z); 

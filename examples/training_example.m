@@ -12,10 +12,25 @@ colors = [255 0 0
             %0 255 255
             ];
 
-ftnames = { 'utvangs'};
+ftnames = {'tdstats', 'haralick', 'shape'};
 
-feats = load('features_sim.mat', ftnames{:});
-load data\sequence_sim.mat imgs maskind;
+ftlabels = {'Estadísticas', 'Haralick', {'Descriptores', 'de Forma'}};
+%{
+ftnames = {'cspclasses', 'sampledsignal', 'utvangs'};
+
+ftlabels = {'Splines naturales', 'Muestreo de señal', 'Ángulos VTU'};
+%}
+
+aux = [ftnames, 'be'];
+
+feats = load('features_sim.mat', aux{:});
+feats.shape = feats.shape(:, {'Elongation', 'Major axis length', 'Entropy'});
+feats.shape.be_r = feats.be(:, 1);
+feats.shape.be_g = feats.be(:, 2);
+feats.shape.be_b = feats.be(:, 3);
+load data\sequence_sim.mat imgs maskind low normal high critical;
+
+%feats.shape = feats.shape(:, {'Total curvature'});
 
 centroids = cell(1, numel(ftnames));
 
@@ -25,7 +40,6 @@ centroids = cell(1, numel(ftnames));
 cols = {'Mean','RMS','StandardDeviation','ShapeFactor','SINAD','SHR',...
     'THD','PeakValue','CrestFactor','ClearanceFactor','ImpulseFactor',...
     'skewness','kurtosis'};
-%}
 
 cols = {'PeakValue','ImpulseFactor', 'CrestFactor','ClearanceFactor'};
 
@@ -33,20 +47,19 @@ tdlabels = [strcat(cols, '_red'),...
     strcat(cols, '_green'),...
     strcat(cols, '_blue')];
 
-%feats.tdstats = feats.tdstats(:, tdlabels);
+feats.tdstats = feats.tdstats(:, tdlabels);
 
-%{
 cols = {'MeanFrequency', 'MedianFrequency',...
     'BandPower', 'OccupiedBandwidth', 'PowerBandwidth', 'PeakAmplitude',...
     'PeakLocation'};
-%}
+
 
 cols = {'MeanFrequency', 'MedianFrequency', 'PowerBandwidth'};
 
 fslabels = [strcat(cols, '_red'),...
     strcat(cols, '_green'),...
     strcat(cols, '_blue')];
-
+%}
 %feats.fsstats = feats.fsstats(:, fslabels);
 
 %feats.utvangs = [std(feats.utvangs(:, 1:361),0, 2), std(feats.utvangs(:, 362:722), 0,2), std(feats.utvangs(:, 723:1083),0,2)];
@@ -56,6 +69,7 @@ for i = 1:numel(ftnames)
         feats.(ftnames{i}) = table2array(feats.(ftnames{i}));
     end
 end
+
 
 channels = 3;
 
@@ -76,7 +90,7 @@ for i = 1:numel(ftnames)
     [labels, c] = kmeans(x(maskind, :), clusters);
     centroids{i} = c;
     img = kmeanssegm(labels, rows, cols, maskind, colors);
-    nexttile, imshow(img), title(ftnames{i});
+    nexttile, imshow(img), title(ftlabels{i});
 end
 
 centroids = dictionary(string(ftnames), centroids);
