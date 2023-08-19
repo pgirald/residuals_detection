@@ -7,23 +7,32 @@ featuresfile = 'features_sim.mat';
 
 clusters = 4;
 
-colors = [255 0 0
-            255 255 0
-            0 255 0
-            0 0 255
-            %255 0 255
-            %0 255 255
-            ];
-
 %Índice de la imagen que se mostrará
 imgIdx = 320;
 
 %Características a ser utilizadas
-ftnames = {'tdstats', 'haralick', 'shape'};
+ftnames = {'kinetics'};
 
 %Títulos correspondientes a las características
-ftlabels = {'Estadísticas', 'Haralick', {'Descriptores', 'de Forma'}};
+ftlabels = {'ktd'};
 %--------Programm configuration end
+
+maxcolor = 16777215;%0xffffff;
+
+step = maxcolor / (clusters + 1);
+
+colorshex = step:step:maxcolor-step;
+
+colors = zeros(clusters, 3);
+
+for i = 1:numel(colorshex)
+    colors(i, :) = hex2rgb(['#',dec2hex(round(colorshex(i)),6)], 255);
+end
+
+colors = [255 0 0
+               0 255 0
+               0 0 255
+               255 255 0];
 
 feats = load(featuresfile, ftnames{:});
 

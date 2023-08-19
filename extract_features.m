@@ -25,10 +25,11 @@ load data\sequence_sim.mat;
 %the name of the output file in which the features will be
 outfile = 'features_sim.mat';
 %features to extract
-feats = {'haralick'};
+feats = {'ktd'};
 %{
 feats = {'csphist', 'cspclasses', 'tdstats', 'fsstats', 'frenetserret',...
-    'haralick', 'cspcoefs', 'sampled', 'utvangles', 'shape', 'be'};
+    'haralick', 'cspcoefs', 'sampled', 'utvangles', 'shape', 'be',...
+    'ktd'};
 %}
 %csphist: cubic splines coefficients histograms
 %cspclasses: cubic splines classes counts
@@ -42,6 +43,7 @@ feats = {'csphist', 'cspclasses', 'tdstats', 'fsstats', 'frenetserret',...
 %utvangles: angles of unit tangen vectors respect to x, y and z
 %shape: shape descriptors
 %be: bending energy
+%ktd: kinetics trayectory descriptor
 
 %bins count for splines coefficiens histograms
 cspbinscount = 5;
@@ -91,6 +93,11 @@ normalizefd = true;
 
 %normalize cubic spline classes histogram
 normalizecspclasses = true;
+
+ktdbins = 20;
+
+ktdfeats = {'txdir', 'tydir', 'tzdir', 'nxdir', 'nydir' ,'nzdir' ,...
+    'bxdir', 'bydir', 'bzdir'};
 
 %-----Programm configuration end-----
 
@@ -163,6 +170,10 @@ frenetserret = zeros(locations, fsbinscount * numel(fsfeats));
 
 %Unit tangent vector angles features matrix
 utvangs = zeros(locations, totalangles * numel(utvfeats));
+
+%Kinetic trayectory descriptor
+
+kinetics = zeros(locations, ktdbins * numel(ktdfeats));
 
 %haralick features matrix
 haralick = table('Size', [locations, numel(haralicklabels)],...
@@ -259,6 +270,10 @@ for i=1:maskedlocs
         be(li, :) = [bendingenergy2(times, r), bendingenergy2(times, g),...
             bendingenergy2(times, b)];
     end
+
+    if any(strcmp(feats, 'ktd'))
+        kinetics(li, :) = ktd(r, g, b, ktdbins, ktdfeats);
+    end
     
     waitbar(i / maskedlocs);
 end
@@ -311,6 +326,10 @@ end
 
 if any(strcmp(feats,'be'))
     save(outfile, 'be', '-append');
+end
+
+if any(strcmp(feats,'ktd'))
+    save(outfile, 'kinetics', '-append');
 end
 
 close(h);

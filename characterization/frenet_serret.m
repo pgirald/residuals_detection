@@ -27,7 +27,7 @@ function [feats] = frenet_serret(x, y, z, bincounts, feats)
 
     ydir = [];
 
-    if any(strcmp(feats,'xdir'))
+    if any(strcmp(feats,'ydir'))
         
         ydir = [histcounts(T(:, 2), bincounts)];
         
@@ -35,7 +35,7 @@ function [feats] = frenet_serret(x, y, z, bincounts, feats)
 
     zdir = [];
 
-    if any(strcmp(feats,'xdir'))
+    if any(strcmp(feats,'zdir'))
         
         zdir = [histcounts(T(:, 3), bincounts)];
         

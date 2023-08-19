@@ -12,11 +12,11 @@ colors = [255 0 0
             %0 255 255
             ];
 
-bestfeats = dictionary({'tdstats','haralick', 'shape'}, [5, 1, 1]);
+bestfeats = dictionary({'tdstats','haralick', 'shape', 'fsstats'}, [2, 1, 1, 2]);
 
-ftnames = {'tdstats', 'haralick', 'shape'};
+ftnames = {'tdstats', 'haralick', 'shape', 'fsstats'};
 
-ftlabels = {'Estadísticas', 'Haralick', {'Descriptores', 'de Forma'}};
+ftlabels = {'Estadísticas (tiempo)', 'Haralick', {'Descriptores', 'de Forma'}, 'Estadísticas (fecuencia)'};
 
 %{
 ftnames = {'cspclasses', 'sampledsignal', 'utvangs'};
