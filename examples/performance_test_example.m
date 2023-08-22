@@ -9,8 +9,8 @@ zonesnames = {'low','normal','high','critical'};
 varsnames = [zonesnames, {'maskind', 'imgs'}];
 
 load kmeansresults.mat labels centroids;
-vars = load('data\sequence_sim.mat', varsnames{:});
-feats = load('features_sim.mat', ftnames{:});
+vars = load('../data/sequence_sim.mat', varsnames{:});
+feats = load('../features_sim.mat', ftnames{:});
 
 cols = {'MeanFrequency', 'MedianFrequency', 'PowerBandwidth'};
 

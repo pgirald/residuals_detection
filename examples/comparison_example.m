@@ -6,8 +6,8 @@ clc;
 %secuence1.mat must contain the photoleasticity images without residual
 vars = {'imgs', 'times'};
 
-s = load('data\sequence_rtrain.mat', vars{:}) ;
-snr = load('data\sequence_nrtest.mat', vars{:});
+s = load('../data/sequence_rtrain.mat', vars{:}) ;
+snr = load('../data/sequence_nrtest.mat', vars{:});
 
 f = 10;
 c = 130;

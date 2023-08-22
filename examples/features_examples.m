@@ -2,7 +2,7 @@ clear;
 close all;
 clc;
 
-load data\sequence_sim.mat;
+load ../data/sequence_sim.mat;
 
 %f = 48;
 %c = 162;
