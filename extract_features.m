@@ -5,7 +5,7 @@ clc;
 addpath characterization;
 
 %-----------Configuration start-------------
-sequencepath = 'data/sequence_sim.mat';
+sequencepath = 'data/sequence_rtest2.mat';
 load(sequencepath);
 
 %The .mat file where the features tables will be stored
@@ -23,7 +23,8 @@ extractors = {...
 ...SplinesClasses("normalize",true,"time",times),...
 ...BendingEnergy(times),...
 ...Downsampling(numel(times),"factor",5, "normalize", true, "maxValue", 255),...
-Decimation(numel(times), "factor", 14);
+...Decimation(numel(times), "factor", 14),...
+Resampling(numel(times), 20)
 };
 %----------- Configuration end -------------
 

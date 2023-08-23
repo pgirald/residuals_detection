@@ -13,16 +13,16 @@ sequencepath = '../data/sequence_sim.mat';
 %e.g feats = {'KTD','Shape','FrecuencyDomainStats'}
 feats = {'KTD','Shape','FrecuencyDomainStats',...
 'TimeDomainStats','SplinesClasses','BendingEnergy', 'Downsampling',...
-'Decimation'};
+'Decimation', 'Resampling'};
 
 %The features for which its centroid will be saved.
 %Let it empty if you dont want to store centroids
 %e.g centfeats = {'Downsampling', 'Decimation'};
-centfeats = {'Downsampling', 'Decimation'};
+centfeats = {};
 
 %Path to the file in which the centroids will be stored
 %e.g centpath = "centroids_sequence_sim.mat";
-centpath = "centroids_sequence_sim.mat";
+centroidspath = "";
 
 %The columns that will be used from the features tables
 %e.g columns = containers.Map(["Shape", "KTD"],{["Entropy", "Elongation"], ["nzdir_1", "txdir_0"]});
@@ -59,7 +59,7 @@ colors = [255 0 0
 %The function must have the same signature than fscmrmr function.
 %If fsalgorithm = [], all the configuration in this section is not applied
 %e.g fsalgorithm = @fscmrmr
-fsalgorithm = @fscmrmr;
+fsalgorithm = [];
 
 %Names of the masks per each zone with different stress levels
 %It is assumed that such masks are in the workspace
@@ -166,10 +166,12 @@ for i = 1:numel(feats)
     nexttile, imshow(img), title(ftheadings{i});
 end
 
-if centpath ~= "" && (~isempty(centpath)) && (~isfile(centpath))
+if centroidspath ~= "" && (~isempty(centroidspath)) && (~isfile(centroidspath))
     aux = 0;
-    save(centpath, 'aux');
+    save(centroidspath, 'aux');
     clear aux;
 end
 
-save(centpath, '-struct', 'centroids', centfeats{:}, '-append')
+if centroidspath ~= "" && (~isempty(centroidspath))
+    save(centroidspath, '-struct', 'centroids', centfeats{:}, '-append');
+end
