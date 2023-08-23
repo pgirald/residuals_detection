@@ -2,6 +2,8 @@ clear;
 clc;
 close all;
 
+%--------Programm configuration start
+
 ftnames = {'cspclasses',...
     'fsstats','sampledsignal'};
 
