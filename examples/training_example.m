@@ -4,7 +4,7 @@ clc;
 close all;
 
 %--------Programm configuration start
-featuresfile = '../features_sim.mat';
+featuresfile = '../feats_sequence_sim.mat';
 
 %Índice de la imagen que se mostrará
 imgIdx = 320;
@@ -13,7 +13,12 @@ imgIdx = 320;
 %Opciones válidas son: {'KTD','Shape','Haralick','FrecuencyDomainStats',...
 %'TimeDomainStats','SplinesClasses','BendingEnergy', 'Downsampling'}
 ftnames = {'KTD','Shape','FrecuencyDomainStats',...
-'TimeDomainStats','SplinesClasses','BendingEnergy', 'Downsampling'};
+'TimeDomainStats','SplinesClasses','BendingEnergy', 'Downsampling',...
+'Decimation'};
+
+%The columns that will be used from the features tables
+columns = containers.Map(["Shape", "TimeDomainStats"],...
+    {["Entropy", "Elongation"], ["Mean_R", "PeakValue_R"]});
 
 %Títulos correspondientes a las características
 ftlabels = ftnames;
@@ -45,6 +50,12 @@ load ../data/sequence_sim.mat imgs maskind;
 feats = load(featuresfile, ftnames{:});
 
 [rows, cols] = size(imgs, [1 2]);
+
+qfeats = string(keys(columns));
+
+for i = 1:numel(qfeats)
+    feats.(qfeats(i)) = feats.(qfeats(i))(:, columns(qfeats(i)));
+end
 
 for i = 1:numel(ftnames)
     feats.(ftnames{i}) = table2array(feats.(ftnames{i}));

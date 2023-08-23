@@ -8,7 +8,7 @@ addpath characterization;
 sequencepath = 'data/sequence_sim.mat';
 load(sequencepath);
 
-%The .mat file where the features table will be stored
+%The .mat file where the features tables will be stored
 %If an empty string is speficied, the name feats_<sequencepath> is given by
 %default
 outfile = "";
@@ -22,7 +22,8 @@ extractors = {...
 ...TimeDomainStats("timeStep", timestep , "normalize",true),...
 ...SplinesClasses("normalize",true,"time",times),...
 ...BendingEnergy(times),...
-Downsampling(numel(times),"factor",5, "normalize", true, "maxValue", 255)
+...Downsampling(numel(times),"factor",5, "normalize", true, "maxValue", 255),...
+Decimation(numel(times), "factor", 14);
 };
 %----------- Configuration end -------------
 
