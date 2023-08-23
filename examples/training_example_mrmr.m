@@ -4,12 +4,13 @@ clc;
 close all;
 
 %--------Programm configuration start
-featuresfile = '../features_sim.mat';
+featuresfile = '../feats_sequence_sim.mat';
 
 ftnames = {'KTD','Shape','FrecuencyDomainStats',...
 'TimeDomainStats','SplinesClasses','BendingEnergy', 'Downsampling'};
 
-bestfeats = dictionary(["Shape"], [2]);
+%Specifies to use the nth best metrics from the features tables
+topfeats = containers.Map(["Shape", "TimeDomainStats"], [2, 2]);
 
 ftlabels = ftnames;
 
@@ -63,8 +64,8 @@ for i = 1:numel(ftnames)
     bestIndices.(ftnames{i}) = [feats.(ftnames{i}).Properties.VariableNames(idx);...
         num2cell(idx);num2cell(scores(idx))];
     feats.(ftnames{i}) = table2array(feats.(ftnames{i}));
-    if isKey(bestfeats, {ftnames{i}})
-        endfeat = bestfeats({ftnames{i}});
+    if isKey(topfeats, {ftnames{i}})
+        endfeat = topfeats(ftnames{i});
     else
         endfeat = numel(idx);
     end

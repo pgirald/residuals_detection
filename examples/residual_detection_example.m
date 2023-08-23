@@ -2,60 +2,87 @@ close all;
 clear;
 clc;
 
-feats = {'cspclasses','cspcoefs','csphist','frenetserret',...
-    'fsstats','haralick','tdstats','sampledsignal'};
+%Programm configuration start----------------------
+
+%Features to be used for the residuals detection
+feats = {'KTD','Shape','FrecuencyDomainStats',...
+'TimeDomainStats','SplinesClasses','BendingEnergy', 'Downsampling'};
+
+%The columns that will be used from the features tables
+columns = containers.Map(["Shape", "TimeDomainStats"],...
+    {["Entropy", "Elongation"], ["Mean_R", "PeakValue_R"]});
 
 data = {'imgs', 'maskind'};
 
-trainfeats = load('features_rtrain.mat', feats{:});
-traindata = load('../data/sequence_rtrain.mat', data{:});
+trainfeats = load('../feats_sequence_r.mat', feats{:});
+residualseq = load('../data/sequence_r.mat', data{:});
+normalseq = load('../data/sequence_nr.mat', data{:});
 
-testfeats = load('features_rtest.mat', feats{:});
-testdata = load('../data/sequence_rtest.mat', data{:});
+testfeats = load('../feats_sequence_rtest2.mat', feats{:});
+testseq = load('../data/sequence_rtest2.mat', data{:});
 
-for i = 1:numel(feats)
-    if isa(trainfeats.(feats{i}), 'table')
-        trainfeats.(feats{i}) = table2array(trainfeats.(feats{i}));
-    end
+%Let diff be the an image obtained by finding the euclidiean distance
+%between each respective pixel in the last image with residuals and the
+%last image without residuals. Then, it is considerd that a location (i,j)
+%was affected by residuals if diff(i, j) < max(diff) * threshold
+threshold = 0.5;
+
+%Programm configuration end  ----------------------
+
+if sum(size(normalseq.imgs) ~= size(residualseq.imgs)) ~= 0
+    error("The size of the sequence of images with residuals must be" + ...
+        " equal to the size of the sequence of images without residuals.");
+end
+
+qfeats = string(keys(columns));
+
+for i = 1:numel(qfeats)
+    trainfeats.(qfeats(i)) = trainfeats.(qfeats(i))(:, columns(qfeats(i)));
+    testfeats.(qfeats(i)) = testfeats.(qfeats(i))(:, columns(qfeats(i)));
 end
 
 for i = 1:numel(feats)
-    if isa(testfeats.(feats{i}), 'table')
-        testfeats.(feats{i}) = table2array(testfeats.(feats{i}));
-    end
+    trainfeats.(feats{i}) = table2array(trainfeats.(feats{i}));
 end
 
-msk = imread('data\imgs_residuals\Plant.bmp');
-rmsk = imread('data\imgs_residuals\Residual_mask.bmp');
-linds = find(msk-rmsk);
-labels = zeros(size(msk, 1) * size(msk, 2), 1) -1;
-labels(linds) = 0;
-linds = find(rmsk);
-labels(linds) = 1;
-labels = labels(traindata.maskind);
+for i = 1:numel(feats)
+    testfeats.(feats{i}) = table2array(testfeats.(feats{i}));
+end
 
-testimgs = testdata.imgs;
+lnimage = normalseq.imgs(:, :, :, end);
 
-out = zeros(size(testimgs, 1) * size(testimgs, 2), 1);
+lrimage = residualseq.imgs(:, :, :, end);
 
-last = size(testimgs, 4);
+diff = sqrt((lnimage(:, :, 1) - lrimage(:, :, 1)) .^ 2 + ...
+    (lnimage(:, :, 2) - lrimage(:, :, 2)) .^ 2 + ...
+    (lnimage(:, :, 3) - lrimage(:, :, 3)) .^ 2);
 
-img = cat(3, testimgs(:, :, 1, last), testimgs(:, :, 2, last), testimgs(:, :, 3, last));
+affected = diff >= max(diff, [], 'all') * threshold;
 
-img = uint8(img);
+out = zeros(size(testseq.imgs, 1) * size(testseq.imgs, 2), 1);
 
-masks = zeros(size(testimgs, 1), size(testimgs, 2), numel(feats));
+masks = zeros(size(testseq.imgs, 1), size(testseq.imgs, 2), numel(feats));
+
+figure, tiledlayout('flow');
+
+nexttile;
+imshow(uint8((diff / max(diff, [],'all'))*255));
+title(["Zones affected", "by residuals", "(traning sequence)"]);
+
+nexttile;
+imagesc(affected);
+title(["Zones affected", "according to threshold", "(traning sequence)"]);
 
 figure, tiledlayout('flow');
 nexttile;
-imshow(img);
+imshow(uint8(testseq.imgs(:,:,:,end)));
 title('Original');
 for i = 1:numel(feats)
     featmat = trainfeats.(feats{i});
-    mdl = fitclinear(featmat(traindata.maskind), labels);
+    mdl = fitclinear(featmat, affected(residualseq.maskind));
     featmat = testfeats.(feats{i});
-    out(testdata.maskind) = predict(mdl, featmat(testdata.maskind));
-    masks(:, :, i) = reshape(out, size(testimgs, [1, 2]));
+    out(testseq.maskind) = predict(mdl, featmat);
+    masks(:, :, i) = reshape(out, size(testseq.imgs, [1, 2]));
     nexttile;
     imshow(masks(:, :, i) * 255);
     title(feats{i});
@@ -67,6 +94,6 @@ for i = 1:numel(feats)
     mask = uint8(masks(:, :, i));
     mask = cat(3, mask, mask, mask);
     nexttile;
-    imshow(img .* mask);
+    imshow(uint8(testseq.imgs(:,:,:,end)) .* mask);
     title(feats{i});
 end

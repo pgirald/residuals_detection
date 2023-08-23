@@ -2,24 +2,39 @@ clear;
 close all;
 clc;
 
-load data\sequence_sim.mat;
-
 addpath characterization;
 
 %-----------Configuration start-------------
-outfile = 'features_sim.mat';
+sequencepath = 'data/sequence_sim.mat';
+load(sequencepath);
 
+%The .mat file where the features table will be stored
+%If an empty string is speficied, the name feats_<sequencepath> is given by
+%default
+outfile = "";
+
+%The feature extractors
 extractors = {... 
-KTD("bins",10, "normalize", true),...
-Shape(),...
-Haralick(),...
-FrecuencyDomainStats("timeStep", timestep, "normalize",true),...
-TimeDomainStats("timeStep", timestep , "normalize",true),...
-SplinesClasses("normalize",true,"time",times),...
-BendingEnergy(times),...
-Downsampling(numel(times),"factor",10, "normalize", true, "maxValue", 255)
+...Shape(),...
+...KTD("bins",10, "normalize", true),...
+...Haralick(),...
+...FrecuencyDomainStats("timeStep", timestep, "normalize",true),...
+...TimeDomainStats("timeStep", timestep , "normalize",true),...
+...SplinesClasses("normalize",true,"time",times),...
+...BendingEnergy(times),...
+Downsampling(numel(times),"factor",5, "normalize", true, "maxValue", 255)
 };
 %----------- Configuration end -------------
+
+if outfile == "" || isempty(outfile)
+    matches = regexp(sequencepath,'[^\\\/\n\t \.<>:"|?*]+\.mat', 'match');
+    
+    if isempty(matches)
+        error('The path to the sequence of images must refer to a .mat file');
+    end
+    
+    outfile = ['feats_',matches{1}];
+end
 
 extscount = numel(extractors);
 

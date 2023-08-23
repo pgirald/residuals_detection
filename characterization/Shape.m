@@ -87,15 +87,16 @@ function [ent] = radentropy(obj, x, y, z)
     cz = mean(z);
     r = ((cx - x).^2 + (cy - y).^2 + (cz - z).^2).^(1/2);
     r_max = max(r);
-    if r_max == 0
-        edges = [0, 1];
+    r_min = min(r);
+    if r_min == r_max;
+        edges = [r_min, r_min + obj.entropyDelta];
     else
-        edges = min(r):obj.entropyDelta:r_max;
+        edges = r_min:obj.entropyDelta:r_max;
         if edges(end) ~= r_max
             edges(end + 1) = r_max;
         end
     end
-    h = histcounts(r, edges, 'Normalization','probability');
+    h = histcounts(r, edges, 'Normalization', 'probability');
     ha = h(h~=0);
     ent = sum(ha .* log10(ha));
 end
