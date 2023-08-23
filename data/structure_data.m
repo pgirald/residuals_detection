@@ -3,18 +3,44 @@ clear;
 clc;
 
 %---Programm configuration start
+
+%Path to the folder containing a sequence of n photoelasticity images
+% numbered from 1 to n, according to the time in which they were captured.
 directory = 'imgs_residuals_test1';
+
+%Name of the file in which will be stored the images properly for further
+% processing
 out = 'sequence_rtest1.mat';
+
+%The number of images inside the folder
 imgscount = 400;
+
+%The extension of all the images files
 extension = 'bmp';
-maskname = 'Plant.bmp';
+
+%The file name of the mask to get the ROI of the images. It is assumed that
+% the mask is located in the same folder than the rest of the images
+maskname = 'Plant';
+
+%How frecuently wehre the images taken (in seconds)
 timestep = 0.1;
+
+%If a smoothing preprocessing should be applied
 smooth = false;
+
+%If the non-smooth images should be stored
 keeporiginals = false;
-haszones = false;
+
+%The name of the files for the masks that corresponds to  zones with
+% different stress levels. It is assumed that they are located in the same
+% folder than the rest of the images
+% e.g zones = {'low', 'normal', 'high', 'critical'};
+
+zones = {};
+
 %---Programm configuration end
 
-mask = imread(['data/', directory, '/', maskname]);
+mask = imread(['data/', directory, '/', maskname, '.', extension]);
 [rows, cols] = size(mask, [1 2]);
 oimgs = zeros(rows, cols, 3, imgscount);
 times = 0 : 0.1 : 0.1 * (imgscount - 1);
@@ -60,13 +86,13 @@ if keeporiginals
     save(['data/', out], 'oimgs', '-append');
 end
 
-if haszones
-    low = imread('low.bmp');
-    normal = imread('normal.bmp');
-    high = imread('high.bmp');
-    critical = imread('critical.bmp');
-    save(['data/', out], 'low', '-append');
-    save(['data/', out], 'normal', '-append');
-    save(['data/', out], 'high', '-append');
-    save(['data/', out], 'critical', '-append');
+zonesmasks = struct;
+
+for i=1:numel(zones)
+    mask = imread([zones{i},'.',extension]);
+    zonesmasks.(zones{i}) = mask;
+end
+
+if ~isempty(zones)
+    save(out, '-struct', 'zonesmasks', zones{:}, '-append');
 end

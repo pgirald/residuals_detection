@@ -1,13 +1,25 @@
 clear;
 close all;
 
-t = (-20:0.1:20)';
+step=0.1;
+
+t = (-20:step:20)';
 
 x = sin(t);
 
 y = 10 * cos(t);
 
 z = cos(t);
+
+samplescount = 20;
+
+[p,q] = rat(samplescount/ numel(t));
+rs = resample(z,p,q);
+
+trs = (t(1):(step*(q/p)):t(end))';
+
+figure, plot(t,z,'-',trs,rs,'o');
+figure, plot(trs, rs,'o');
 %{
 P1(:, 1) = t';
 

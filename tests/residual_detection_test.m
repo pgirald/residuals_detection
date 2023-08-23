@@ -7,7 +7,8 @@ clc;
 %Features to be used for the residuals detection
 %e.g feats = {'KTD','Shape','FrecuencyDomainStats'}
 feats = {'KTD','Shape','FrecuencyDomainStats',...
-'TimeDomainStats','SplinesClasses','BendingEnergy', 'Downsampling'};
+'TimeDomainStats','SplinesClasses','BendingEnergy', 'Downsampling',...
+'Decimation', 'Resampling'};
 
 %The columns that will be used from the features tables
 %e.g containers.Map(["Shape", "KTD"],{["Entropy", "Elongation"], ["nzdir_1", "txdir_0"]});

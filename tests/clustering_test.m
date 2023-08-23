@@ -13,7 +13,7 @@ sequencepath = '../data/sequence_sim.mat';
 %e.g feats = {'KTD','Shape','FrecuencyDomainStats'}
 feats = {'KTD','Shape','FrecuencyDomainStats',...
 'TimeDomainStats','SplinesClasses','BendingEnergy', 'Downsampling',...
-'Decimation', 'Resampling'};
+'Decimation', 'Resampling', 'Haralick'};
 
 %The features for which its centroid will be saved.
 %Let it empty if you dont want to store centroids
@@ -26,8 +26,7 @@ centroidspath = "";
 
 %The columns that will be used from the features tables
 %e.g columns = containers.Map(["Shape", "KTD"],{["Entropy", "Elongation"], ["nzdir_1", "txdir_0"]});
-columns = containers.Map(["Shape", "TimeDomainStats"],...
-    {["Entropy", "Elongation"], ["Mean_R", "PeakValue_R"]});
+columns = containers.Map();
 
 %The headings that will be disaplayed per each feature segmentation
 %e.g ftheadings = {["Spline", " classes"], 'Time statistics'}
@@ -59,7 +58,7 @@ colors = [255 0 0
 %The function must have the same signature than fscmrmr function.
 %If fsalgorithm = [], all the configuration in this section is not applied
 %e.g fsalgorithm = @fscmrmr
-fsalgorithm = [];
+fsalgorithm = @fscmrmr;
 
 %Names of the masks per each zone with different stress levels
 %It is assumed that such masks are in the workspace
@@ -72,7 +71,7 @@ masks = {'critical', 'high', 'normal', 'low'};
 % fsalgorithm.
 %do topfeats = containers.Map() if you dont want this to have effect
 %e.g topfeats = containers.Map(["Shape", "TimeDomainStats"], [2, 2]);
-topfeats = containers.Map(["Shape", "TimeDomainStats", "SplinesClasses"], [2, 2, 1]);
+topfeats = containers.Map(["Shape", "TimeDomainStats", "Haralick"], [2, 2, 2]);
 
 %--------  Features ranking configuration end (optional)
 

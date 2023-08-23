@@ -1,1 +1,0 @@
-In this folder goes the photoelasticity images with a residual stress applied
