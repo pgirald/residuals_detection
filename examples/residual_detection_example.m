@@ -5,21 +5,32 @@ clc;
 %Programm configuration start----------------------
 
 %Features to be used for the residuals detection
+%e.g feats = {'KTD','Shape','FrecuencyDomainStats'}
 feats = {'KTD','Shape','FrecuencyDomainStats',...
 'TimeDomainStats','SplinesClasses','BendingEnergy', 'Downsampling'};
 
 %The columns that will be used from the features tables
+%e.g containers.Map(["Shape", "KTD"],{["Entropy", "Elongation"], ["nzdir_1", "txdir_0"]});
 columns = containers.Map(["Shape", "TimeDomainStats"],...
     {["Entropy", "Elongation"], ["Mean_R", "PeakValue_R"]});
 
-data = {'imgs', 'maskind'};
+%Path to the features for training the residuals detection model
+trainfeatspath = '../feats_sequence_r.mat';
 
-trainfeats = load('../feats_sequence_r.mat', feats{:});
-residualseq = load('../data/sequence_r.mat', data{:});
-normalseq = load('../data/sequence_nr.mat', data{:});
+%Path to the sequence of images with residuals from which the training
+% features were extracted
+residualseqpath = '../data/sequence_r.mat';
 
-testfeats = load('../feats_sequence_rtest2.mat', feats{:});
-testseq = load('../data/sequence_rtest2.mat', data{:});
+%Path to the sequence of images without residuals, that is "parallel" to
+%the sequence of images with residuals used for the training
+normalseqpath = '../data/sequence_nr.mat';
+
+%Path to the features for testing the residuals detection model
+testfeatspath = '../feats_sequence_rtest2.mat';
+
+%Path to the sequence of images with residuals from which the test
+% features were extracted
+testseqpath = '../data/sequence_rtest2.mat';
 
 %Let diff be the an image obtained by finding the euclidiean distance
 %between each respective pixel in the last image with residuals and the
@@ -28,6 +39,15 @@ testseq = load('../data/sequence_rtest2.mat', data{:});
 threshold = 0.5;
 
 %Programm configuration end  ----------------------
+
+data = {'imgs', 'maskind'};
+
+trainfeats = load(trainfeatspath, feats{:});
+residualseq = load(residualseqpath, data{:});
+normalseq = load(normalseqpath, data{:});
+
+testfeats = load(testfeatspath, feats{:});
+testseq = load(testseqpath, data{:});
 
 if sum(size(normalseq.imgs) ~= size(residualseq.imgs)) ~= 0
     error("The size of the sequence of images with residuals must be" + ...

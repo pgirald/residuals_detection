@@ -1,77 +1,175 @@
 addpath ../segmentation;
+addpath ../external;
 clear;
 clc;
 close all;
 
 %--------Programm configuration start
-featuresfile = '../feats_sequence_sim.mat';
 
-%Índice de la imagen que se mostrará
-imgIdx = 320;
+featurespath = '../feats_sequence_sim.mat';
+sequencepath = '../data/sequence_sim.mat';
 
-%Características a ser utilizadas
-%Opciones válidas son: {'KTD','Shape','Haralick','FrecuencyDomainStats',...
-%'TimeDomainStats','SplinesClasses','BendingEnergy', 'Downsampling'}
-ftnames = {'KTD','Shape','FrecuencyDomainStats',...
+%Features to be used for clustering
+%e.g feats = {'KTD','Shape','FrecuencyDomainStats'}
+feats = {'KTD','Shape','FrecuencyDomainStats',...
 'TimeDomainStats','SplinesClasses','BendingEnergy', 'Downsampling',...
 'Decimation'};
 
+%The features for which its centroid will be saved.
+%Let it empty if you dont want to store centroids
+%e.g centfeats = {'Downsampling', 'Decimation'};
+centfeats = {'Downsampling', 'Decimation'};
+
+%Path to the file in which the centroids will be stored
+%e.g centpath = "centroids_sequence_sim.mat";
+centpath = "centroids_sequence_sim.mat";
+
 %The columns that will be used from the features tables
+%e.g columns = containers.Map(["Shape", "KTD"],{["Entropy", "Elongation"], ["nzdir_1", "txdir_0"]});
 columns = containers.Map(["Shape", "TimeDomainStats"],...
     {["Entropy", "Elongation"], ["Mean_R", "PeakValue_R"]});
 
-%Títulos correspondientes a las características
-ftlabels = ftnames;
+%The headings that will be disaplayed per each feature segmentation
+%e.g ftheadings = {["Spline", " classes"], 'Time statistics'}
+ftheadings = feats;
 
+%The clustering algorithm to be used.
+%The function must have the same signature than kmeans function
+%e.g kalgorithm = @kmeans;
+kalgorithm = @kmeans;
+
+%Number of clusters for the clustering algorithm
 clusters = 4;
 
+%The color that will be displayed for each zone with different stress
+% levels. There has to be one color for each cluster
+% If the array is empty, default values are computed
+% e.g for two clusters: colors = [255,0,0; 255,255,0]
 colors = [255 0 0
-               0 255 0
-               0 0 255
-               255 255 0];
+            255 255 0
+            0 255 0
+            0 0 255
+            ];
+
 %--------Programm configuration end
 
-%{
-maxcolor = 16777215;%0xffffff;
+%--------Features ranking configuration start (optional)
 
-step = maxcolor / (clusters + 1);
+%A callback to a function that implements a feature selection algorithm
+%The function must have the same signature than fscmrmr function.
+%If fsalgorithm = [], all the configuration in this section is not applied
+%e.g fsalgorithm = @fscmrmr
+fsalgorithm = @fscmrmr;
 
-colorshex = step:step:maxcolor-step;
+%Names of the masks per each zone with different stress levels
+%It is assumed that such masks are in the workspace
+%For example, you could save the masks in the file of sequence of images
+%The masks are used as labels for the fsalgorithm
+%e.g masks = {'critical', 'high', 'normal', 'low'};
+masks = {'critical', 'high', 'normal', 'low'};
 
-colors = zeros(clusters, 3);
+%Specifies to use for the clustering the nth best metrics according to
+% fsalgorithm.
+%do topfeats = containers.Map() if you dont want this to have effect
+%e.g topfeats = containers.Map(["Shape", "TimeDomainStats"], [2, 2]);
+topfeats = containers.Map(["Shape", "TimeDomainStats", "SplinesClasses"], [2, 2, 1]);
 
-for i = 1:numel(colorshex)
-    colors(i, :) = hex2rgb(['#',dec2hex(round(colorshex(i)),6)], 255);
+%--------  Features ranking configuration end (optional)
+
+if isempty(colors)
+    maxcolor = 16777215;%0xffffff;
+    
+    step = maxcolor / (clusters + 1);
+    
+    colorshex = step:step:maxcolor-step;
+    
+    colors = zeros(clusters, 3);
+    
+    for i = 1:numel(colorshex)
+        colors(i, :) = hex2rgb(['#',dec2hex(round(colorshex(i)),6)], 255);
+    end
 end
-%}
+seqvars = [{'imgs'}, {'maskind'}, masks(:)'];
 
-load ../data/sequence_sim.mat imgs maskind;
+seqdata = load(sequencepath,  seqvars{:});
 
-feats = load(featuresfile, ftnames{:});
+featsdata = load(featurespath, feats{:});
 
-[rows, cols] = size(imgs, [1 2]);
+[rows, cols] = size(seqdata.imgs, [1 2]);
 
 qfeats = string(keys(columns));
 
 for i = 1:numel(qfeats)
-    feats.(qfeats(i)) = feats.(qfeats(i))(:, columns(qfeats(i)));
+    featsdata.(qfeats(i)) = featsdata.(qfeats(i))(:, columns(qfeats(i)));
 end
 
-for i = 1:numel(ftnames)
-    feats.(ftnames{i}) = table2array(feats.(ftnames{i}));
+if isa(fsalgorithm, 'function_handle')
+
+    zoneslbs = zeros(rows * cols, 1);
+    
+    expectedR = zeros(rows, cols);
+    expectedG = zeros(rows, cols);
+    expectedB = zeros(rows, cols);
+    
+    masks = string(masks);
+    
+    for i = 1:numel(masks)
+        mask = seqdata.(masks(i));
+        zoneslbs(find(mask ~= 0)) = i;
+        expectedR(mask ~= 0) = colors(i, 1);
+        expectedG(mask ~= 0) = colors(i, 2);
+        expectedB(mask ~= 0) = colors(i, 3);
+    end
+    
+    zoneslbs = zoneslbs(zoneslbs ~= 0);
+    
+    expected = cat(3,expectedR, expectedG, expectedB);
+    
+    bestIndices = struct;
+    
+    for i = 1:numel(feats)
+        [idx, scores] = fsalgorithm(featsdata.(feats{i}), zoneslbs);
+        bestIndices.(feats{i}) = [featsdata.(feats{i}).Properties.VariableNames(idx);...
+            num2cell(idx);num2cell(scores(idx))];
+        if isKey(topfeats, {feats{i}})
+            endfeat = topfeats(feats{i});
+        else
+            endfeat = numel(idx);
+        end
+        featsdata.(feats{i}) = featsdata.(feats{i})(:, idx(1: endfeat));
+    end
 end
 
-img = cat(3, imgs(:, :, 1, imgIdx), imgs(:, :, 2, imgIdx), imgs(:, :, 3, imgIdx));
+for i = 1:numel(feats)
+    featsdata.(feats{i}) = table2array(featsdata.(feats{i}));
+end
 
-img = uint8(img);
+centroids = struct;
+
+img = uint8(seqdata.imgs(:, :, :, end));
 
 tiledlayout('flow');
 
 nexttile, imshow(img), title('Original');
 
-for i = 1:numel(ftnames)
-    x = feats.(ftnames{i});
-    [labels, c] = kmeans(x, clusters);
-    img = kmeanssegm(labels, rows, cols, maskind, colors);
-    nexttile, imshow(img), title(ftlabels{i});
+if isa(fsalgorithm, 'function_handle')
+    nexttile, imshow(expected), title({'Expected', 'result'});
 end
+
+for i = 1:numel(feats)
+    x = featsdata.(feats{i});
+    [labels, c] = kalgorithm(x, clusters);
+    if ismember(feats{i}, centfeats)
+        centroids.(string(feats{i})) = c;
+    end
+    img = kmeanssegm(labels, rows, cols, seqdata.maskind, colors);
+    nexttile, imshow(img), title(ftheadings{i});
+end
+
+if centpath ~= "" && (~isempty(centpath)) && (~isfile(centpath))
+    aux = 0;
+    save(centpath, 'aux');
+    clear aux;
+end
+
+save(centpath, '-struct', 'centroids', centfeats{:}, '-append')
