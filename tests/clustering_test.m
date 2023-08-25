@@ -25,8 +25,9 @@ centfeats = {};
 centroidspath = "";
 
 %The columns that will be used from the features tables
-%e.g columns = containers.Map(["Shape", "KTD"],{["Entropy", "Elongation"], ["nzdir_1", "txdir_0"]});
-columns = containers.Map();
+%e.g columns = {["Shape", "KTD"],{["Entropy", "Elongation"], ["nzdir_1",
+%"txdir_0"]}};
+columns = {"Haralick", {["idm_blue", "imc1_green"]}};
 
 %The headings that will be disaplayed per each feature segmentation
 %e.g ftheadings = {["Spline", " classes"], 'Time statistics'}
@@ -58,7 +59,7 @@ colors = [255 0 0
 %The function must have the same signature than fscmrmr function.
 %If fsalgorithm = [], all the configuration in this section is not applied
 %e.g fsalgorithm = @fscmrmr
-fsalgorithm = @fscmrmr;
+fsalgorithm = [];
 
 %Names of the masks per each zone with different stress levels
 %It is assumed that such masks are in the workspace
@@ -96,10 +97,10 @@ featsdata = load(featurespath, feats{:});
 
 [rows, cols] = size(seqdata.imgs, [1 2]);
 
-qfeats = string(keys(columns));
+qfeats = columns{1};
 
 for i = 1:numel(qfeats)
-    featsdata.(qfeats(i)) = featsdata.(qfeats(i))(:, columns(qfeats(i)));
+    featsdata.(qfeats(i)) = featsdata.(qfeats(i))(:, columns{2}{i});
 end
 
 if isa(fsalgorithm, 'function_handle')

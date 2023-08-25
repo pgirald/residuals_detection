@@ -8,12 +8,12 @@ clc;
 %e.g feats = {'KTD','Shape','FrecuencyDomainStats'}
 feats = {'KTD','Shape','FrecuencyDomainStats',...
 'TimeDomainStats','SplinesClasses','BendingEnergy', 'Downsampling',...
-'Decimation', 'Resampling'};
+'Decimation', 'Resampling', 'Haralick'};
 
 %The columns that will be used from the features tables
-%e.g containers.Map(["Shape", "KTD"],{["Entropy", "Elongation"], ["nzdir_1", "txdir_0"]});
-columns = containers.Map(["Shape", "TimeDomainStats"],...
-    {["Entropy", "Elongation"], ["Mean_R", "PeakValue_R"]});
+%e.g columns = {["Shape", "KTD"],{["Entropy", "Elongation"], ["nzdir_1", "txdir_0"]}};
+columns = {["Shape", "TimeDomainStats", "Haralick"],...
+    {["Entropy", "Elongation"], ["Mean_R", "PeakValue_R"], ["variance_red", "variance_blue", "variance_green"]}};
 
 %Path to the features for training the residuals detection model
 trainfeatspath = '../feats_sequence_r.mat';
@@ -27,11 +27,11 @@ residualseqpath = '../data/sequence_r.mat';
 normalseqpath = '../data/sequence_nr.mat';
 
 %Path to the features for testing the residuals detection model
-testfeatspath = '../feats_sequence_rtest2.mat';
+testfeatspath = '../feats_sequence_rtest1.mat';
 
 %Path to the sequence of images with residuals from which the test
 % features were extracted
-testseqpath = '../data/sequence_rtest2.mat';
+testseqpath = '../data/sequence_rtest1.mat';
 
 %Let diff be the an image obtained by finding the euclidiean distance
 %between each respective pixel in the last image with residuals and the
@@ -55,11 +55,11 @@ if sum(size(normalseq.imgs) ~= size(residualseq.imgs)) ~= 0
         " equal to the size of the sequence of images without residuals.");
 end
 
-qfeats = string(keys(columns));
+qfeats = columns{1};
 
 for i = 1:numel(qfeats)
-    trainfeats.(qfeats(i)) = trainfeats.(qfeats(i))(:, columns(qfeats(i)));
-    testfeats.(qfeats(i)) = testfeats.(qfeats(i))(:, columns(qfeats(i)));
+    trainfeats.(qfeats(i)) = trainfeats.(qfeats(i))(:, columns{2}{i});
+    testfeats.(qfeats(i)) = testfeats.(qfeats(i))(:, columns{2}{i});
 end
 
 for i = 1:numel(feats)
