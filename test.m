@@ -5,11 +5,11 @@ step=0.1;
 
 t = (-20:step:20)';
 
-x = sin(t);
+x = 5*sin(t);
 
-y = 10 * cos(t);
+y = 5*cos(t);
 
-z = cos(t);
+z = 5*cos(t);
 
 samplescount = 20;
 
@@ -20,6 +20,62 @@ trs = (t(1):(step*(q/p)):t(end))';
 
 figure, plot(t,z,'-',trs,rs,'o');
 figure, plot(trs, rs,'o');
+
+%{
+dR = [gradient(x(:)),gradient(y(:)),gradient(z(:))];
+dt = gradient(t);
+dRdt = dR./dt;
+T = dRdt./sqrt(sum(dRdt.^2,2));%Vector tangente unitario
+
+dT = [gradient(T(:,1)),gradient(T(:,2)),gradient(T(:,3))];
+dTdt = dT./dt;
+
+N = dTdt./sqrt(sum(dTdt.^2,2)); %Vector normal unitario
+
+B = cross(T,N); %Vector binormal unitario
+%}
+dR = [x(2:end)-x(1:end-1),y(2:end)-y(1:end-1),z(2:end)-z(1:end-1)];
+ds = sqrt(sum(dR.^2,2));
+s = [0;cumsum(ds)];
+
+dRds = [gradient(x,s),gradient(y,s),gradient(z,s)];
+
+T = dRds./sqrt(sum(dRds.^2,2)); % Unit tangent vector.
+
+dTds = [gradient(T(:,1),s),gradient(T(:,2),s),gradient(T(:,3),s)];
+
+N = dTds ./ sqrt(sum((dTds).^2,2)); % Unit normal vector.
+
+B = cross(T,N); % Unit bi-normal vector.
+
+points = 1:80:401;
+
+figure, plot3(x,y,z,'DisplayName',"Trayectoria de píxel");
+hold on;
+quiver3(x(points),y(points),z(points),...
+    T(points,1),T(points,2),T(points,3),...
+    'LineWidth',1,'Color','r','AutoScale','off','DisplayName',"Tangente unitario");
+quiver3(x(points),y(points),z(points),...
+    N(points,1),N(points,2),N(points,3),...
+    'LineWidth',1,'Color','g','AutoScale','off','DisplayName',"Normal unitario");
+quiver3(x(points),y(points),z(points),...
+    B(points,1),B(points,2),B(points,3),...
+    'LineWidth',1,'Color','b','AutoScale','off','DisplayName',"Binormal unitario");
+
+legend
+axis equal;
+hold off;
+%{
+plot(t,x);
+dx = gradient(x);
+dt = gradient(t);
+dx = dx./sqrt((dx.^2)+(dt.^2));
+dt = dt./sqrt((dx.^2)+(dt.^2));
+points = 1:20:400;
+hold on;
+quiver(t(points),x(points),dt(points),dx(points),'g','AutoScale','off');
+axis equal
+%}
 %{
 P1(:, 1) = t';
 

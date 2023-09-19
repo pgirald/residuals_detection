@@ -27,11 +27,11 @@ residualseqpath = '../data/sequence_r.mat';
 normalseqpath = '../data/sequence_nr.mat';
 
 %Path to the features for testing the residuals detection model
-testfeatspath = '../feats_sequence_rtest1.mat';
+testfeatspath = '../feats_sequence_rtest2.mat';
 
 %Path to the sequence of images with residuals from which the test
 % features were extracted
-testseqpath = '../data/sequence_rtest1.mat';
+testseqpath = '../data/sequence_rtest2.mat';
 
 %Let diff be the an image obtained by finding the euclidiean distance
 %between each respective pixel in the last image with residuals and the

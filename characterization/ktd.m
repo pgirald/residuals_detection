@@ -70,29 +70,31 @@ classdef KTD < Extractor
             hists = zeros(1, numel(obj.selectedFeats) * obj.bins);
             j = 1;
         
-            dr = [gradient(x(:)) , gradient(y(:)) , gradient(z(:))];
-	        ds = sum(dr.^2,2).^(0.5); % Arc length associated with each point. ||dr||.
-	        
-	        T = dr ./ ds; % Unit tangent vector.
-	        
-	        dT = [gradient(T(:,1)) , gradient(T(:,2)) , gradient(T(:,3))]; % T'(t).
-	        dTds = dT ./ ds;
-	        
-	        kappa = sum((dT./ds).^2,2).^(0.5);
-	        
-	        N = dTds ./ kappa; % Unit normal vector.
-	        
-	        B = cross(T,N); % Unit bi-normal vector.
+            dR = [x(2:end)-x(1:end-1),y(2:end)-y(1:end-1),z(2:end)-z(1:end-1)];
+            ds = sqrt(sum(dR.^2,2));
+            s = [0;cumsum(ds)];%arc lengths
+            
+            dRds = [gradient(x,s),gradient(y,s),gradient(z,s)];
+            
+            T = dRds./sqrt(sum(dRds.^2,2));%unit tangent vector.
+            
+            dTds = [gradient(T(:,1),s),gradient(T(:,2),s),gradient(T(:,3),s)];
+            
+            N = dTds./sqrt(sum((dTds).^2,2));%unit normal vector.
+            
+            B = cross(T,N);%unit bi-normal vector.
         
             fsframe = [T,N,B];
         
             for i = 1:numel(obj.selectedFeats)
+                %{
                 angs = acos(fsframe(:, KTD.featsMap(obj.selectedFeats(i))));
                 angs(angs < 0) = angs(angs < 0) + 2*pi;
                 angs = round(obj.bins * (angs / (2*pi)));
                 angs(angs == obj.bins) = 0;
                 hists(j:j + obj.bins - 1) = histcounts(angs, 0:obj.bins, "Normalization", obj.normalization);
-                %hists(j:j + obj.bins - 1) = histcounts(angs, obj.bins);
+                %}
+                hists(j:j + obj.bins - 1) = histcounts(fsframe(:, KTD.featsMap(obj.selectedFeats(i))), obj.bins);
                 j = j + obj.bins;
             end
         end

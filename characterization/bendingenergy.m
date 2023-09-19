@@ -38,7 +38,7 @@ classdef BendingEnergy < Extractor
         function [be] = bendingenergy(obj, signal)
             dy = signal(2:end)-signal(1:end-1);
             dx = obj.time(2:end)-obj.time(1:end-1);
-            theta = atan(dy./dx);
+            theta = atan2(dy,dx);
             cc = theta;
             cc(theta < 0) = theta(theta < 0) + 2*pi;
             cc = round(4 * cc / pi);
