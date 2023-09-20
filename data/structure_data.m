@@ -6,14 +6,14 @@ clc;
 
 %Path to the folder containing a sequence of n photoelasticity images
 % numbered from 1 to n, according to the time in which they were captured.
-directory = 'imgs_residuals_test1';
+directory = 'imagenes_normales_fluo';
 
 %Name of the file in which will be stored the images properly for further
 % processing
-out = 'sequence_rtest1.mat';
+out = 'sequence_nrf.mat';
 
 %The number of images inside the folder
-imgscount = 400;
+imgscount = 561;
 
 %The extension of all the images files
 extension = 'bmp';
@@ -40,14 +40,14 @@ zones = {};
 
 %---Programm configuration end
 
-mask = imread(['data/', directory, '/', maskname, '.', extension]);
+mask = imread([directory, '/', maskname, '.', extension]);
 [rows, cols] = size(mask, [1 2]);
 oimgs = zeros(rows, cols, 3, imgscount);
 times = 0 : 0.1 : 0.1 * (imgscount - 1);
 times = times';
 
 for i = 1:imgscount
-    img = imread(['data/', directory, '/', num2str(i), '.', extension]);
+    img = imread([directory, '/', num2str(i), '.', extension]);
     oimgs(:, :, :, i) = img(:, :, :);
 end
 
@@ -80,10 +80,10 @@ end
 maskind = find(mask);
 [maskrow, maskcol] = ind2sub([rows cols], maskind);
 
-save(['data/', out], 'imgs', 'times', 'maskind', 'maskrow', 'maskcol');
+save(out, 'imgs', 'times', 'maskind', 'maskrow', 'maskcol');
 
 if keeporiginals
-    save(['data/', out], 'oimgs', '-append');
+    save(out, 'oimgs', '-append');
 end
 
 zonesmasks = struct;

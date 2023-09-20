@@ -5,11 +5,11 @@ step=0.1;
 
 t = (-20:step:20)';
 
-x = 5*sin(t);
+x = 0.5*t.*sin(t);
 
-y = 5*cos(t);
+y = 1.5*t.*sin(0.5*t);
 
-z = 5*cos(t);
+z = 0.25*t.*cos(t);
 
 samplescount = 20;
 
@@ -48,7 +48,7 @@ N = dTds ./ sqrt(sum((dTds).^2,2)); % Unit normal vector.
 
 B = cross(T,N); % Unit bi-normal vector.
 
-points = 1:80:401;
+points = 1:40:401;
 
 figure, plot3(x,y,z,'DisplayName',"Trayectoria de píxel");
 hold on;
@@ -63,7 +63,7 @@ quiver3(x(points),y(points),z(points),...
     'LineWidth',1,'Color','b','AutoScale','off','DisplayName',"Binormal unitario");
 
 legend
-axis equal;
+%axis equal;
 hold off;
 %{
 plot(t,x);

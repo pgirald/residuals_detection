@@ -6,14 +6,12 @@ close all;
 
 %--------Programm configuration start
 
-featurespath = '../feats_sequence_sim.mat';
-sequencepath = '../data/sequence_sim.mat';
+featurespath = '../feats_sequence_rf.mat';
+sequencepath = '../data/sequence_rf.mat';
 
 %Features to be used for clustering
 %e.g feats = {'KTD','Shape','FrecuencyDomainStats'}
-feats = {'KTD','Shape','FrecuencyDomainStats',...
-'TimeDomainStats','SplinesClasses','BendingEnergy', 'Downsampling',...
-'Decimation', 'Resampling', 'Haralick'};
+feats = {'KTD','Downsampling','Haralick'};
 
 %The features for which its centroid will be saved.
 %Let it empty if you dont want to store centroids
@@ -24,10 +22,11 @@ centfeats = {};
 %e.g centpath = "centroids_sequence_sim.mat";
 centroidspath = "";
 
-%The columns that will be used from the features tables
+%The columns that will be used from the features tables.
+%Make columns = {[]} if you dont want to specify columns.
 %e.g columns = {["Shape", "KTD"],{["Entropy", "Elongation"], ["nzdir_1",
 %"txdir_0"]}};
-columns = {"Haralick", {["idm_blue", "imc1_green"]}};
+columns = {[]};
 
 %The headings that will be disaplayed per each feature segmentation
 %e.g ftheadings = {["Spline", " classes"], 'Time statistics'}

@@ -6,32 +6,30 @@ clc;
 
 %Features to be used for the residuals detection
 %e.g feats = {'KTD','Shape','FrecuencyDomainStats'}
-feats = {'KTD','Shape','FrecuencyDomainStats',...
-'TimeDomainStats','SplinesClasses','BendingEnergy', 'Downsampling',...
-'Decimation', 'Resampling', 'Haralick'};
+feats = {'KTD','Downsampling', 'Haralick'};
 
 %The columns that will be used from the features tables
+%Make columns = {[]} if you dont want to specify columns.
 %e.g columns = {["Shape", "KTD"],{["Entropy", "Elongation"], ["nzdir_1", "txdir_0"]}};
-columns = {["Shape", "TimeDomainStats", "Haralick"],...
-    {["Entropy", "Elongation"], ["Mean_R", "PeakValue_R"], ["variance_red", "variance_blue", "variance_green"]}};
+columns = {[]};
 
 %Path to the features for training the residuals detection model
-trainfeatspath = '../feats_sequence_r.mat';
+trainfeatspath = '../feats_sequence_rf.mat';
 
 %Path to the sequence of images with residuals from which the training
 % features were extracted
-residualseqpath = '../data/sequence_r.mat';
+residualseqpath = '../data/sequence_rf.mat';
 
 %Path to the sequence of images without residuals, that is "parallel" to
 %the sequence of images with residuals used for the training
-normalseqpath = '../data/sequence_nr.mat';
+normalseqpath = '../data/sequence_nrf.mat';
 
 %Path to the features for testing the residuals detection model
-testfeatspath = '../feats_sequence_rtest2.mat';
+testfeatspath = '../feats_sequence_rftest.mat';
 
 %Path to the sequence of images with residuals from which the test
 % features were extracted
-testseqpath = '../data/sequence_rtest2.mat';
+testseqpath = '../data/sequence_rftest.mat';
 
 %Let diff be the an image obtained by finding the euclidiean distance
 %between each respective pixel in the last image with residuals and the

@@ -94,7 +94,7 @@ classdef KTD < Extractor
                 angs(angs == obj.bins) = 0;
                 hists(j:j + obj.bins - 1) = histcounts(angs, 0:obj.bins, "Normalization", obj.normalization);
                 %}
-                hists(j:j + obj.bins - 1) = histcounts(fsframe(:, KTD.featsMap(obj.selectedFeats(i))), obj.bins);
+                hists(j:j + obj.bins - 1) = histcounts(fsframe(:, KTD.featsMap(obj.selectedFeats(i))), obj.bins,"Normalization",obj.normalization);
                 j = j + obj.bins;
             end
         end
