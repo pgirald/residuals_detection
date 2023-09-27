@@ -6,11 +6,11 @@ clc;
 
 %Path to the folder containing a sequence of n photoelasticity images
 % numbered from 1 to n, according to the time in which they were captured.
-directory = 'imagenes_normales_fluo';
+directory = 'imagenes_test_fluo';
 
 %Name of the file in which will be stored the images properly for further
 % processing
-out = 'sequence_nrf.mat';
+out = 'sequence_rftest.mat';
 
 %The number of images inside the folder
 imgscount = 561;

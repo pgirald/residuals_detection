@@ -116,3 +116,5 @@ for i = 1:numel(feats)
     imshow(uint8(testseq.imgs(:,:,:,end)) .* mask);
     title(feats{i});
 end
+
+rmfield(testfeats,)
