@@ -87,7 +87,7 @@ for i=1:extscount
     feattables.(class(ext)) = ...
         array2table(featsmat, "VariableNames", ext.getHeadings());
     save(outfile, '-struct', 'feattables', class(ext), '-append');
-    feattables = rmf
+    feattables = rmf;
     ield(feattables, class(ext));
 end
 toc

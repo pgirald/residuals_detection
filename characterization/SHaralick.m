@@ -16,6 +16,7 @@ classdef SHaralick < Extractor
         selectedFeats
         featsIdxs
         NumLevels
+        timeres
     end
 
     methods
@@ -32,6 +33,8 @@ classdef SHaralick < Extractor
                 %Signal sample rate in Hertz
                 args.NumLevels = 256;
                 %Number of gray levels for the co-ocurrence matrix
+                args.timeres = 0.5;
+                %The time resolution for the spectogram
             end
             obj.selectedFeats = string(args.selectedFeats);
             checkmebership(obj.selectedFeats, SHaralick.featsNames);
@@ -41,6 +44,7 @@ classdef SHaralick < Extractor
             obj.offset = args.offset;
             obj.fs = args.fs;
             obj.NumLevels = args.NumLevels;
+            obj.timeres = args.timeres;
         end
         function feature = extract(obj, s)
             feature = [obj.graycofeats(s(:,1)), obj.graycofeats(s(:,2)),...
@@ -68,7 +72,7 @@ classdef SHaralick < Extractor
 
 
                 %Revisar parámetros más óptimos para pspectrum
-                ps = pspectrum(signal, obj.fs, 'spectrogram','TimeResolution',0.5);
+                ps = pspectrum(signal, obj.fs, 'spectrogram','TimeResolution',obj.timeres);
             
                 glcm = graycomatrix(uint8(rescale(ps,0,obj.NumLevels-1)),...
                     "GrayLimits", [0,obj.NumLevels-1],...

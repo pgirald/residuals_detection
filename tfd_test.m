@@ -24,7 +24,6 @@ for i=1:size(points,1)
     b(:)=s.imgs(row,col,3,:);
 
     figure,tiledlayout('flow');
-    
     nexttile;
     imshow(uint8(s.imgs(:,:,:,end)));
     hold on;
