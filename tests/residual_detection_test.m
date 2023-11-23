@@ -6,7 +6,7 @@ clc;
 
 %Features to be used for the residuals detection
 %e.g feats = {'KTD','Shape','FrecuencyDomainStats'}
-feats = {'KTD','Downsampling', 'Haralick'};
+feats = {'Downsampling'};
 
 %The columns that will be used from the features tables
 %Make columns = {[]} if you dont want to specify columns.
@@ -14,22 +14,22 @@ feats = {'KTD','Downsampling', 'Haralick'};
 columns = {[]};
 
 %Path to the features for training the residuals detection model
-trainfeatspath = '../feats_sequence_rf.mat';
+trainfeatspath = '../feats_sequence_r.mat';
 
 %Path to the sequence of images with residuals from which the training
 % features were extracted
-residualseqpath = '../data/sequence_rf.mat';
+residualseqpath = '../data/sequence_r.mat';
 
 %Path to the sequence of images without residuals, that is "parallel" to
 %the sequence of images with residuals used for the training
-normalseqpath = '../data/sequence_nrf.mat';
+normalseqpath = '../data/sequence_nr.mat';
 
 %Path to the features for testing the residuals detection model
-testfeatspath = '../feats_sequence_rftest.mat';
+testfeatspath = '../feats_sequence_rtest2.mat';
 
 %Path to the sequence of images with residuals from which the test
 % features were extracted
-testseqpath = '../data/sequence_rftest.mat';
+testseqpath = '../data/sequence_rtest2.mat';
 
 %Let diff be the an image obtained by finding the euclidiean distance
 %between each respective pixel in the last image with residuals and the
@@ -116,5 +116,3 @@ for i = 1:numel(feats)
     imshow(uint8(testseq.imgs(:,:,:,end)) .* mask);
     title(feats{i});
 end
-
-rmfield(testfeats,)
